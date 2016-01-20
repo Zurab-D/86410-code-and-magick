@@ -15,7 +15,7 @@ function sumArrElements(arr) {
 /* сумма произведений соответствующих элементов двух массивов */
 function multiple2ArrElements(arr1, arr2) {
   var result = 0;
-  for (var i=0; i<arr1.length && i < arr2.length; i++) {
+  for (var i=0; i<arr1.length && i<arr2.length; i++) {
     result += arr1[i] * arr2[i];
   };
   return result;

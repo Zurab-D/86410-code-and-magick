@@ -374,22 +374,151 @@
       }
     },
 
+    showMyMessage: function(msgText, x, y, rectWidth, boxIsRectangle) {
+      boxIsRectangle = !!boxIsRectangle;
+
+      /* константы */
+      var
+        DELTA = 10, /* размер смещения тении */
+        FONT_FACE = 'PT Mono',
+        FONT_SIZE = '16px',
+        FONT_WEIGHT = 'bold',
+        FONT_STYLE = FONT_WEIGHT + ' ' + FONT_SIZE + ' ' + FONT_FACE
+      ;
+
+
+      /* посчитаем ширину и высоту текста */
+      function getFontProperties(text, fontStyle) {
+        text = text || '';
+        fontStyle = fontStyle || FONT_STYLE;
+        var span = document.querySelector('#calc-text-width-temp-hidden');
+        if (!span) {
+          span = document.createElement('span');
+          span.style.position = "absolute";
+          span.setAttribute("id", "calc-text-width-temp-hidden");
+          span.style.top = '-100px';
+          span.style.zIndex = -100;
+          span.style.opacity = 0;
+          span.style.visibility = "hidden";
+          span.style.whiteSpace = 'nowrap';
+          span.setAttribute("display", "inline !important");
+          span.style.font = fontStyle;
+          document.body.appendChild(span);
+        }
+        span.innerHTML = text;
+        return {width: span.clientWidth, height: span.clientHeight};
+      };
+
+
+      /* разобъем текст сообщения по строкам */
+      function getMsgLines(msgText, rectWidth) {
+        var arr = [];
+        /* ширина одного символа (корректно для моноширинного шрифта) */
+        var charWidth = Math.round(getFontProperties(msgText).width / msgText.length);
+        /* кол-во символов в строке заданной ширины */
+        var charCountInLine = Math.floor(rectWidth / charWidth);
+        /* разобъем текст сообщения по строкам */
+        for (var i = 0; i < msgText.length; i += charCountInLine) {
+          arr.push(msgText.slice(i, i+charCountInLine))
+        };
+        return arr;
+      };
+
+
+      /* случайное смещение (для рандомного наклона сторон четурехугоьника) */
+      function calcDeviation() {
+        /* максимальное отклонение координаты угла от заданного значения (для скошенных краёв) */
+        var maxDeviation = 20;
+        /* отступ между текстом и границей блока */
+        var textMargin = 5;
+        /* результат */
+        return Math.floor(Math.random() * maxDeviation) + textMargin;
+      };
+
+
+      /* рисуем четырехугольник */
+      function drawQuadrangle(self, pos, offsetShadow) {
+        offsetShadow = offsetShadow || 0;
+        self.ctx.beginPath();
+        self.ctx.moveTo(pos.xTopLeft + offsetShadow,     pos.yTopLeft + offsetShadow);
+        self.ctx.lineTo(pos.xTopRight + offsetShadow,    pos.yTopRight + offsetShadow);
+        self.ctx.lineTo(pos.xBottomRight + offsetShadow, pos.yBottomRight + offsetShadow);
+        self.ctx.lineTo(pos.xBottomLeft + offsetShadow,  pos.yBottomLeft + offsetShadow);
+        self.ctx.lineTo(pos.xTopLeft + offsetShadow,     pos.yTopLeft + offsetShadow);
+        self.ctx.closePath();
+        self.ctx.fill();
+      };
+
+
+      /* длинный текст сообщения запихнем построчно в массив */
+      var msgArr = getMsgLines(msgText, rectWidth);
+
+      /* если строк > 1, то помножим на 1.2 - просвет между строками */
+      var interLineMultiplier = msgArr.length > 1 ? 1.2 : 1;
+      /* вычислим высоту блока текста */
+      var rectHeight = Math.round(getFontProperties(msgText).height * interLineMultiplier /*просвет между строками*/ * msgArr.length);
+      rectHeight = rectHeight < getFontProperties(msgText).height + 10 ? getFontProperties(msgText).height + 10 : rectHeight;
+
+      if (boxIsRectangle) {
+        /* рисуем теневой прямоугольник */
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        this.ctx.fillRect(x + DELTA, y + DELTA, rectWidth, rectHeight)
+        /* рисуем основной прямоугольник */
+        this.ctx.fillStyle = '#fff';
+        this.ctx.fillRect(x, y, rectWidth, rectHeight)
+      } else {
+        var pos = {};
+        /* левый верхний угол */
+        pos.xTopLeft = x - calcDeviation();
+        pos.yTopLeft = y - calcDeviation();
+        /* правый верхний угол */
+        pos.xTopRight = x + rectWidth + calcDeviation();
+        pos.yTopRight = y - calcDeviation();
+        /* правый нижний угол */
+        pos.xBottomRight = x + rectWidth + calcDeviation();
+        pos.yBottomRight = y + rectHeight + calcDeviation();
+        /* левый нижний угол */
+        pos.xBottomLeft = x - calcDeviation();
+        pos.yBottomLeft = y + rectHeight + calcDeviation();
+
+        /* рисуем теневой четырехугольник */
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        drawQuadrangle(this, pos, 10);
+
+        /* рисуем основной четырехугольник */
+        this.ctx.fillStyle = '#fff';
+        drawQuadrangle(this, pos);
+      };
+
+      /* пишем текст из массива */
+      this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+      this.ctx.font = 'bold 16px PT Mono';
+      for (var i=0; i<msgArr.length; i++) {
+        this.ctx.fillText(
+          msgArr[i],
+          x,
+          y + getFontProperties(msgText).height + i * getFontProperties(msgText).height * interLineMultiplier
+        );
+      };
+    },
+
     /**
      * Отрисовка экрана паузы.
      */
     _drawPauseScreen: function() {
       switch (this.state.currentStatus) {
         case Verdict.WIN:
-          console.log('you have won!');
+          this.showMyMessage('Солнце в трубу золотую трубит: "Слава герою-бойцу! Враг побеждён, уничтожен, разбит, Слава герою-бойцу!"', 200, 70, 300 /*, true*/);
+          //this.showMyMessage('Поздравляю с победой', 200, 70, 300 /*, true*/);
           break;
         case Verdict.FAIL:
-          console.log('you have failed!');
+          console.log('Ты проиграл, но помни: поражение — школа, из которой правда всегда выходит более сильной.');
           break;
         case Verdict.PAUSE:
-          console.log('game is on pause!');
+          console.log('Стоп игра! (game is on pause)');
           break;
         case Verdict.INTRO:
-          console.log('welcome to the game! Press Space to start');
+          console.log('Превед, Медвед! Жми пробел и поскакали!');
           break;
       }
     },

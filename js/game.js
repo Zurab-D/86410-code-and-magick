@@ -375,7 +375,7 @@
     },
 
     showMyMessage: function(msgText, x, y, rectWidth, boxIsRectangle) {
-      boxIsRectangle = !!boxIsRectangle;
+      boxIsRectangle = typeof boxIsRectangle === 'boolean' && boxIsRectangle;
 
       /* константы */
       var
@@ -383,8 +383,7 @@
         FONT_FACE = 'PT Mono',
         FONT_SIZE = '16px',
         FONT_WEIGHT = 'bold',
-        FONT_STYLE = FONT_WEIGHT + ' ' + FONT_SIZE + ' ' + FONT_FACE
-      ;
+        FONT_STYLE = FONT_WEIGHT + ' ' + FONT_SIZE + ' ' + FONT_FACE;
 
 
       /* посчитаем ширину и высоту текста */
@@ -394,35 +393,37 @@
         var span = document.querySelector('#calc-text-width-temp-hidden');
         if (!span) {
           span = document.createElement('span');
-          span.style.position = "absolute";
-          span.setAttribute("id", "calc-text-width-temp-hidden");
+          span.style.position = 'absolute';
+          span.setAttribute('id', 'calc-text-width-temp-hidden');
           span.style.top = '-100px';
           span.style.zIndex = -100;
           span.style.opacity = 0;
-          span.style.visibility = "hidden";
+          span.style.visibility = 'hidden';
           span.style.whiteSpace = 'nowrap';
-          span.setAttribute("display", "inline !important");
+          span.setAttribute('display', 'inline !important');
           span.style.font = fontStyle;
           document.body.appendChild(span);
         }
         span.innerHTML = text;
         return {width: span.clientWidth, height: span.clientHeight};
-      };
+      }
+      var fontProperties = getFontProperties(msgText);
 
 
       /* разобъем текст сообщения по строкам */
-      function getMsgLines(msgText, rectWidth) {
+      function getMsgLines(messageText, rectangleWidth) {
         var arr = [];
         /* ширина одного символа (корректно для моноширинного шрифта) */
-        var charWidth = Math.round(getFontProperties(msgText).width / msgText.length);
+        var charWidth = Math.round(fontProperties.width / messageText.length);
         /* кол-во символов в строке заданной ширины */
-        var charCountInLine = Math.floor(rectWidth / charWidth);
+        var charCountInLine = Math.floor(rectangleWidth / charWidth);
         /* разобъем текст сообщения по строкам */
-        for (var i = 0; i < msgText.length; i += charCountInLine) {
-          arr.push(msgText.slice(i, i+charCountInLine))
-        };
+        for (var i = 0; i < messageText.length; i += charCountInLine) {
+          arr.push(messageText.slice(i, i + charCountInLine));
+        }
         return arr;
-      };
+      }
+      var msgArr = getMsgLines(msgText, rectWidth);
 
 
       /* случайное смещение (для рандомного наклона сторон четурехугоьника) */
@@ -433,39 +434,53 @@
         var textMargin = 5;
         /* результат */
         return Math.floor(Math.random() * maxDeviation) + textMargin;
-      };
+      }
 
 
       /* рисуем четырехугольник */
-      function drawQuadrangle(self, pos, offsetShadow) {
+      function drawQuadrangle(context2d, pos, offsetShadow) {
         offsetShadow = offsetShadow || 0;
-        self.ctx.beginPath();
-        self.ctx.moveTo(pos.xTopLeft + offsetShadow,     pos.yTopLeft + offsetShadow);
-        self.ctx.lineTo(pos.xTopRight + offsetShadow,    pos.yTopRight + offsetShadow);
-        self.ctx.lineTo(pos.xBottomRight + offsetShadow, pos.yBottomRight + offsetShadow);
-        self.ctx.lineTo(pos.xBottomLeft + offsetShadow,  pos.yBottomLeft + offsetShadow);
-        self.ctx.lineTo(pos.xTopLeft + offsetShadow,     pos.yTopLeft + offsetShadow);
-        self.ctx.closePath();
-        self.ctx.fill();
-      };
+        context2d.beginPath();
+        context2d.moveTo(pos.xTopLeft + offsetShadow, pos.yTopLeft + offsetShadow);
+        context2d.lineTo(pos.xTopRight + offsetShadow, pos.yTopRight + offsetShadow);
+        context2d.lineTo(pos.xBottomRight + offsetShadow, pos.yBottomRight + offsetShadow);
+        context2d.lineTo(pos.xBottomLeft + offsetShadow, pos.yBottomLeft + offsetShadow);
+        context2d.lineTo(pos.xTopLeft + offsetShadow, pos.yTopLeft + offsetShadow);
+        context2d.closePath();
+        context2d.fill();
+      }
 
-
-      /* длинный текст сообщения запихнем построчно в массив */
-      var msgArr = getMsgLines(msgText, rectWidth);
 
       /* если строк > 1, то помножим на 1.2 - просвет между строками */
-      var interLineMultiplier = msgArr.length > 1 ? 1.2 : 1;
+      function getInterLineMultiplier(msgArray) {
+        if (msgArray.length > 1) {
+          return 1.2;
+        } else {
+          return 1;
+        }
+      }
+
+
+      /* величина смещения по вертикали для вывода следующей строки */
+      function getVertShift(lineNo) {
+        return fontProperties.height + lineNo * fontProperties.height * getInterLineMultiplier(msgArr);
+      }
+
+
       /* вычислим высоту блока текста */
-      var rectHeight = Math.round(getFontProperties(msgText).height * interLineMultiplier /*просвет между строками*/ * msgArr.length);
-      rectHeight = rectHeight < getFontProperties(msgText).height + 10 ? getFontProperties(msgText).height + 10 : rectHeight;
+      var rectHeight = Math.round(fontProperties.height * getInterLineMultiplier(msgArr) * msgArr.length);
+      rectHeight = rectHeight < fontProperties.height + 10 ? fontProperties.height + 10 : rectHeight;
+      if (rectHeight < fontProperties.height + 10) {
+        rectHeight = fontProperties.height + 10;
+      }
 
       if (boxIsRectangle) {
         /* рисуем теневой прямоугольник */
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        this.ctx.fillRect(x + DELTA, y + DELTA, rectWidth, rectHeight)
+        this.ctx.fillRect(x + DELTA, y + DELTA, rectWidth, rectHeight);
         /* рисуем основной прямоугольник */
         this.ctx.fillStyle = '#fff';
-        this.ctx.fillRect(x, y, rectWidth, rectHeight)
+        this.ctx.fillRect(x, y, rectWidth, rectHeight);
       } else {
         var pos = {};
         /* левый верхний угол */
@@ -483,23 +498,19 @@
 
         /* рисуем теневой четырехугольник */
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-        drawQuadrangle(this, pos, 10);
+        drawQuadrangle(this.ctx, pos, 10);
 
         /* рисуем основной четырехугольник */
         this.ctx.fillStyle = '#fff';
-        drawQuadrangle(this, pos);
-      };
+        drawQuadrangle(this.ctx, pos);
+      }
 
       /* пишем текст из массива */
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
       this.ctx.font = 'bold 16px PT Mono';
-      for (var i=0; i<msgArr.length; i++) {
-        this.ctx.fillText(
-          msgArr[i],
-          x,
-          y + getFontProperties(msgText).height + i * getFontProperties(msgText).height * interLineMultiplier
-        );
-      };
+      for (var i = 0; i < msgArr.length; i++) {
+        this.ctx.fillText(msgArr[i], x, y + getVertShift(i));
+      }
     },
 
     /**

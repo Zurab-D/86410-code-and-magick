@@ -8,18 +8,19 @@
   formOpenButton.onclick = function(evt) {
     evt.preventDefault();
     formContainer.classList.remove('invisible');
+    /* загрузить куки */
+    readCookies();
   };
 
   formCloseButton.onclick = function(evt) {
     evt.preventDefault();
     formContainer.classList.add('invisible');
   };
-})();
 
 
 
-/* ----------------------------------------------------------------------- */
-(function() {
+  /* ----------------------------------------------------------------------- */
+  /*global docCookies*/
   var reviewName = document.querySelector('#review-name');
   var reviewText = document.querySelector('#review-text');
   var reviewMarksAll = document.querySelectorAll('input[type="radio"][name="review-mark"]');
@@ -29,7 +30,11 @@
   var btnSubmit = document.querySelector('.review-submit');
   var form = document.querySelector('.review-form');
 
-  /* узнать оценку */
+
+
+  /**
+   * узнать оценку
+   */
   function getMark() {
     for (var i = 0; i < reviewMarksAll.length; i++) {
       if (reviewMarksAll[i].checked) {
@@ -39,15 +44,25 @@
     return 3;
   }
 
-  /* проверка валидности имени */
+
+
+  /**
+   * проверка валидности имени
+   */
   function isNameValid() {
     return reviewName.value.trim() !== '';
   }
 
-  /* проверка валидности текста, если оценка < 3 */
+
+
+  /**
+   * проверка валидности текста, если оценка < 3
+   */
   function isTextValid(mark) {
     return mark > 2 || reviewText.value.trim() !== '';
   }
+
+
 
   /**
    * Проверка валидности элементов формы
@@ -103,6 +118,34 @@
 
 
 
+  /**
+   * Сохранить печенюшки
+   * Сохраните в cookies оценку и имя пользователя
+   * Срок жизни cookie — количество дней, прошедшее с вашего ближайшего дня рождения
+   */
+  function saveCookies(nameValue, markValue) {
+    var vEnd = new Date(Date.now() + Date.now() - new Date('2015-11-04')).toUTCString();
+    if (nameValue.trim()) {
+      docCookies.setItem('name', nameValue.trim(), vEnd);
+    }
+    if (markValue.trim()) {
+      docCookies.setItem('mark', markValue.trim(), vEnd);
+    }
+  }
+
+
+
+  /**
+   * Загрузка значений полей из печенюшек
+   */
+  function readCookies() {
+    reviewName.value = docCookies.getItem('name');
+    var mark = docCookies.getItem('mark');
+    reviewMarksAll[mark - 1].checked = true;
+  }
+
+
+
   /* отслеживаем изменения */
   for (var i = 0; i < reviewMarksAll.length; i++) {
     reviewMarksAll[i].onchange = function() {
@@ -117,10 +160,12 @@
   };
 
 
-  /* вешаем событие на Submit */
+
+  /* вешаем событие на submit */
   form.onsubmit = function(event) {
     event.preventDefault();
     if (isFormValid()) {
+      saveCookies(reviewName.value, getMark());
       form.submit();
     } else {
       console.log('Форма не валидна!');

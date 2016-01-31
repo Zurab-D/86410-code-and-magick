@@ -54,16 +54,16 @@
     /* при ошибке загрузке картинки в атрибут SRC пишем картинку ошибки загрузки */
     img.onerror = function(err) {
       console.log('err: '+img.alt);
-      img.src = '';
       errorLoadImage();
-      clone.classList.add('review-load-failure--onerror');
+      //img.src = '';
+      //clone.classList.add('review-load-failure--onerror');
     }
 
     /* взводим таймаут, по которому назначим картинку ошибки загрузки */
     var TIMEOUT_IMAGE = 10000; /* 10 сек. */
     var timeout = setTimeout(function() {
       errorLoadImage();
-      clone.classList.add('review-load-failure--timeout');
+      //clone.classList.add('review-load-failure--timeout');
     }, TIMEOUT_IMAGE)
 
     /* начинаем загрузку картинки */

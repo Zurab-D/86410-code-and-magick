@@ -118,18 +118,27 @@
 
 
 
+  function getDateExpire(dateLastBirthDay) {
+    /* сколько дней прошло после последнего ДР */
+    var daysAfterLastBirthDay = Date.now() - dateLastBirthDay;
+
+    /* дата протухания печенюшки = сейчас + кол-во дней с последнего ДР  */
+    return new Date(Date.now() + daysAfterLastBirthDay).toUTCString();
+  }
+
+
   /**
    * Сохранить печенюшки
    * Сохраните в cookies оценку и имя пользователя
    * Срок жизни cookie — количество дней, прошедшее с вашего ближайшего дня рождения
    */
-  function saveCookies(nameValue, markValue) {
-    var vEnd = new Date(Date.now() + Date.now() - new Date('2015-11-04')).toUTCString();
+  function saveCookies(nameValue, markValue, dateEnd) {
+
     if (nameValue.trim()) {
-      docCookies.setItem('name', nameValue.trim(), vEnd);
+      docCookies.setItem('name', nameValue.trim(), dateEnd);
     }
-    if (markValue.trim()) {
-      docCookies.setItem('mark', markValue.trim(), vEnd);
+    if (markValue) {
+      docCookies.setItem('mark', markValue, dateEnd);
     }
   }
 
@@ -139,25 +148,37 @@
    * Загрузка значений полей из печенюшек
    */
   function readCookies() {
-    reviewName.value = docCookies.getItem('name');
-    var mark = docCookies.getItem('mark');
-    reviewMarksAll[mark - 1].checked = true;
+    try {
+      reviewName.value = docCookies.getItem('name');
+      var mark = docCookies.getItem('mark');
+      reviewMarksAll[mark - 1].checked = true;
+    } catch (err) {}
+  }
+
+
+
+  /**
+   * Повесить обработчик на все события изменения элемента.
+   * Идея взята отсюда: https://learn.javascript.ru/events-change
+   */
+  function changeFormElement(element, functionElementProcessor) {
+    element.onchange = element.onkeyup = element.oninput = functionElementProcessor;
+    element.onpropertychange = function(event) {
+      if (event.propertyName == "value") functionElementProcessor();
+    }
+    element.oncut = function() {
+      setTimeout(functionElementProcessor, 0); // на момент oncut значение еще старое
+    };
   }
 
 
 
   /* отслеживаем изменения */
   for (var i = 0; i < reviewMarksAll.length; i++) {
-    reviewMarksAll[i].onchange = function() {
-      refreshRequiredFieldsInfo();
-    };
+    changeFormElement(reviewMarksAll[i], refreshRequiredFieldsInfo);
   }
-  reviewName.onchange = function() {
-    refreshRequiredFieldsInfo();
-  };
-  reviewText.onchange = function() {
-    refreshRequiredFieldsInfo();
-  };
+  changeFormElement(reviewName, refreshRequiredFieldsInfo);
+  changeFormElement(reviewText, refreshRequiredFieldsInfo);
 
 
 
@@ -165,7 +186,8 @@
   form.onsubmit = function(event) {
     event.preventDefault();
     if (isFormValid()) {
-      saveCookies(reviewName.value, getMark());
+      var dateLastBirthDay = Date('2015-11-04');
+      saveCookies(reviewName.value, getMark(), getDateExpire(dateLastBirthDay));
       form.submit();
     } else {
       console.log('Форма не валидна!');

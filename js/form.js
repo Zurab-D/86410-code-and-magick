@@ -152,7 +152,9 @@
       reviewName.value = docCookies.getItem('name');
       var mark = docCookies.getItem('mark');
       reviewMarksAll[mark - 1].checked = true;
-    } catch (err) {}
+    } catch (err) {
+      console.log('Ошибка ' + err.name + ': ' + err.message);
+    }
   }
 
 
@@ -164,8 +166,10 @@
   function changeFormElement(element, functionElementProcessor) {
     element.onchange = element.onkeyup = element.oninput = functionElementProcessor;
     element.onpropertychange = function(event) {
-      if (event.propertyName == "value") functionElementProcessor();
-    }
+      if (event.propertyName === 'value') {
+        functionElementProcessor();
+      }
+    };
     element.oncut = function() {
       setTimeout(functionElementProcessor, 0); // на момент oncut значение еще старое
     };

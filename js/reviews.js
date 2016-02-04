@@ -21,7 +21,6 @@
     var clone;
     var img = {};
     var timeout;
-    var e = 0;
 
     clone = getTemplateContent(reviewTemplate).cloneNode(true);
     clone.querySelector('.review-text').textContent = review.description;
@@ -35,14 +34,12 @@
       if (timeout) {
         clearTimeout(timeout);
       }
-      img.src = '';
     }
 
 
 
     /* создаем объект-картинку */
     img = new Image(124, 124);
-    //img = clone.querySelector('.review-author');
 
     /* при загрузке созданной картинки вставим ее в элемент */
     img.onload = function() {
@@ -53,14 +50,7 @@
     };
 
     /* при ошибке загрузке картинки, назначаем элементу соотв. класс */
-    img.onerror = function() {
-      errorLoadImage();
-      //img.onerror = null; // - если раскомментировать, перестает срабатывать бесконечно
-      if (++e < 100) {
-        console.log('err (' + e + '): ' + img.alt);
-      }
-    };
-
+    img.onerror = errorLoadImage;
 
     /* взводим таймаут, по которому назначим картинку ошибки загрузки */
     timeout = setTimeout(errorLoadImage, TIMEOUT_IMAGE);
@@ -89,11 +79,3 @@
   /* показываем фильтры отзывов */
   reviewsFilter.classList.remove('invisible');
 })();
-/*
-::::: ВОПРОСЫ :::::
-
-  - img.onerror() срабатывает бесконечно. Почему?
-    Приходится писать "img.onerror = null;" чтобы после первой отработки остановилась.
-
-  - Зачем мы делаем "img = new Image()", если и без этого все работает (img = clone.querySelector('.review-author'))
-*/

@@ -17,6 +17,7 @@
   /* выводим элементы на страницу */
   function createNewElement(review) {
     var TIMEOUT_IMAGE = 10000; /* 10 сек. */
+    var IMAGE_SIZE = 124;
     var reviewTemplate = document.querySelector('#review-template');
     var clone;
     var img = {};
@@ -39,7 +40,7 @@
 
 
     /* создаем объект-картинку */
-    img = new Image(124, 124);
+    img = new Image(IMAGE_SIZE, IMAGE_SIZE);
 
     /* при загрузке созданной картинки вставим ее в элемент */
     img.onload = function() {

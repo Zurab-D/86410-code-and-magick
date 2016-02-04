@@ -380,7 +380,7 @@
       /* константы */
       var
         DELTA = 10, /* размер смещения тении */
-        FONT_FACE = 'PT Mono',
+        FONT_FACE = '"PT Mono"',
         FONT_SIZE = '16px',
         FONT_WEIGHT = 'bold',
         FONT_STYLE = FONT_WEIGHT + ' ' + FONT_SIZE + ' ' + FONT_FACE;
@@ -507,7 +507,7 @@
 
       /* пишем текст из массива */
       this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-      this.ctx.font = 'bold 16px PT Mono';
+      this.ctx.font = FONT_STYLE;//'bold 16px PT Mono';
       for (var i = 0; i < msgArr.length; i++) {
         this.ctx.fillText(msgArr[i], x, y + getVertShift(i));
       }
@@ -523,13 +523,13 @@
           //this.showMyMessage('Поздравляю с победой', 200, 70, 300 /*, true*/);
           break;
         case Verdict.FAIL:
-          console.log('Ты проиграл, но помни: поражение — школа, из которой правда всегда выходит более сильной.');
+          this.showMyMessage('Ты проиграл, но помни: поражение — школа, из которой правда всегда выходит более сильной.', 200, 70, 300);
           break;
         case Verdict.PAUSE:
-          console.log('Стоп игра! (game is on pause)');
+          this.showMyMessage('Стоп игра! (game is on pause)', 200, 70, 300, true);
           break;
         case Verdict.INTRO:
-          console.log('Превед, Медвед! Жми пробел и поскакали!');
+          this.showMyMessage('Превед, Медвед! Жми пробел и поскакали!', 200, 70, 300);
           break;
       }
     },

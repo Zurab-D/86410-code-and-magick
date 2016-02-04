@@ -32,7 +32,9 @@
     /* обработка ошибки загрузки картинки */
     function errorLoadImage() {
       clone.classList.add('review-load-failure');
-      timeout && clearTimeout(timeout);
+      if (timeout) {
+        clearTimeout(timeout);
+      }
       img.src = '';
     }
 
@@ -45,15 +47,19 @@
     /* при загрузке созданной картинки вставим ее в элемент */
     img.onload = function() {
       clone.replaceChild(img, clone.querySelector('.review-author'));
-      timeout && clearTimeout(timeout);
-    }
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
 
     /* при ошибке загрузке картинки, назначаем элементу соотв. класс */
     img.onerror = function() {
       errorLoadImage();
       //img.onerror = null; // - если раскомментировать, перестает срабатывать бесконечно
-      (++e < 100) && console.log('err ('+e+'): ' + img.alt);
-    }
+      if (++e < 100) {
+        console.log('err (' + e + '): ' + img.alt);
+      }
+    };
 
 
     /* взводим таймаут, по которому назначим картинку ошибки загрузки */
@@ -75,7 +81,8 @@
   reviewsFilter.classList.add('invisible');
 
   /* перебрать все элементы в структуре данных */
-  reviews.forEach(function(review){
+  /*global reviews*/
+  reviews.forEach(function(review) {
     reviewsList.appendChild(createNewElement(review));
   });
 

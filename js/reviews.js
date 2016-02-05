@@ -7,7 +7,13 @@
   var ratingClasses = ['one', 'two', 'three', 'four', 'five'];
   var filterControls = document.forms[0].querySelectorAll('input[name="reviews"]');
   var activeFilterId;
-  var reviews; // эта переменная нужна только для режима JSON
+
+  /* Эта переменная нужна только при работе по AJAX,
+     для работы по JSONP  нужно:
+      1. закомментировать эту переменную
+      2. раскомментировать два закомметированных скрипта в низу файла index.html
+  */
+  var reviews;
 
 
 
@@ -260,7 +266,7 @@
   /* прячем фильтры отзывов */
   reviewsFilter.classList.add('invisible');
 
-  /* Вывести элементы по технологии JSON */
+  /* Вывести элементы по технологии JSONP */
   //showLoadingMsg();
   //filterControls[0].click();
 

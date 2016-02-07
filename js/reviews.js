@@ -6,7 +6,13 @@
   var reviewsFilter = document.querySelector('.reviews-filter');
   var ratingClasses = ['one', 'two', 'three', 'four', 'five'];
   var filterControls = document.forms[0].querySelectorAll('input[name="reviews"]');
+  var btnShowMore = document.querySelector('.reviews-controls-more');
+  var footer = document.querySelector('footer');
   var activeFilterId;
+  var filteredReviews;
+  var filteredPagesCount;
+  var PAGE_SIZE = 3;
+  var currentPage = 0;
 
   /* Эта переменная нужна только при работе по AJAX,
      для работы по JSONP  нужно:
@@ -172,9 +178,23 @@
 
   /**
    * Вывод данных на страницу
+   * @param {Array} reviewsToRender  Массив объектов (отзывов), которые нужно вывести на страницу
+   * @param {boolean=} isAppendMode  Режим добавления новых отзывов или предварительно чистим контейнер
    */
-  var renderReviews = function(reviewsToRender) {
-    reviewsList.innerHTML = '';
+  var renderReviews = function(reviewsToRender, isAppendMode) {
+    if (!isAppendMode) {
+      reviewsList.innerHTML = '';
+    }
+    /* отрежем отзывы текущей страницы */
+    reviewsToRender = reviewsToRender.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+    /* покажем кнопку "Ещё отзывы" если :
+        - отзывы есть
+        - текущая страница < 2
+        - текущая страница не является последней  */
+    if (reviewsToRender.length > 0 && currentPage < 2 && currentPage < filteredPagesCount - 1) {
+      btnShowMore.classList.remove('invisible');
+    }
+    /* выводим на страницу */
     reviewsToRender.forEach(function(review) {
       reviewsList.appendChild(createNewElement(review));
     });
@@ -185,14 +205,15 @@
 
 
 
-
   /* переключение фильтров */
   var setActiveFilter = function(filterId) {
     if (activeFilterId === filterId) {
       return;
     }
 
-    var filteredReviews;
+    currentPage = 0;
+    window.removeEventListener('scroll', scrollProcessing);
+    btnShowMore.classList.add('invisible');
 
     switch (filterId) {
       case 'reviews-all':
@@ -229,6 +250,7 @@
         });
         break;
     }
+    filteredPagesCount = Math.ceil(filteredReviews.length / PAGE_SIZE);
     renderReviews(filteredReviews);
   };
 
@@ -238,12 +260,12 @@
    * Инициализация activeFilterId и событий перключения фильтра
    */
   var initActiveFilterId = function() {
-    for (var i = 0; i < filterControls.length; i++) {
-      filterControls[i].onclick = function(event) {
-        var filterId = event.target.id;
-        setActiveFilter(filterId);
-      };
-    }
+    reviewsFilter.addEventListener('click', function(event) {
+      var clickedElement = event.target;
+      if (clickedElement.name === 'reviews') {
+        setActiveFilter(clickedElement.id);
+      }
+    })
   };
 
 
@@ -256,6 +278,46 @@
     reviews = JSON.parse(dataJson);
     filterControls[0].click();
   };
+
+
+
+  /**
+   * Функция показа следующей страницы отзывов
+   */
+  var showNextPage = function() {
+    if (currentPage < (filteredPagesCount - 1)) {
+      currentPage++;
+      renderReviews(filteredReviews, true);
+    }
+  }
+
+
+
+  /**
+   * Функция обработки скроллинга
+   */
+  var scrollProcessing = function() {
+    var footerCoordinates = footer.getBoundingClientRect();
+    var viewportHeight = window.innerHeight;
+    if (footerCoordinates.top - viewportHeight <= footerCoordinates.height) {
+      showNextPage();
+    }
+  }
+
+
+
+  /*** Обработка клика по кнопке "Еще отзывы" */
+  btnShowMore.addEventListener('click', function() {
+    /* покажем след. страницу */
+    showNextPage();
+    /* после второго клика спрячем кнопку, далее вывод новых страниц по скроллингу */
+    if (currentPage > 1) {
+      btnShowMore.classList.add('invisible');
+      /* обработка скроллинга */
+      window.addEventListener('scroll', scrollProcessing);
+    }
+  });
+
 
 
 

@@ -189,7 +189,7 @@
    *      и текущая страница не последняя
    * @param {number} reviewsCount  количество отзывов, которые нужно отобразить
    */
-  var enableBtnOrScroll = function (reviewsCount) {
+  var enableBtnOrScroll = function(reviewsCount) {
     if (reviewsCount > 0 && currentPage < 2 && currentPage < filteredPagesCount - 1) {
       btnShowMore.classList.remove('invisible');
     } else {
@@ -200,7 +200,7 @@
         window.addEventListener('scroll', scrollProcessing);
       }
     }
-  }
+  };
 
 
 
@@ -293,7 +293,7 @@
       if (clickedElement.name === 'reviews') {
         setActiveFilter(clickedElement.id);
       }
-    })
+    });
   };
 
 
@@ -317,7 +317,7 @@
       currentPage++;
       renderReviews(filteredReviews, true);
     }
-  }
+  };
 
 
 
@@ -336,7 +336,7 @@
         scrollTimeout = null;
       }, TIMEOUT_SCROLL);
     }
-  }
+  };
 
 
 

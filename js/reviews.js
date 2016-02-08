@@ -11,17 +11,14 @@
   var activeFilterId;
   var filteredReviews;
   var filteredPagesCount;
-  // кол-во отзывов выводимых за раз (по кнопке "Ещё", по скролу)
   var PAGE_SIZE = 3;
   var currentPage = 0;
-  var scrollTimeout;
-  // таймаут прореживания события onscroll
-  var TIMEOUT_SCROLL = 10;
 
   /* Эта переменная нужна только при работе по AJAX,
      для работы по JSONP  нужно:
       1. закомментировать эту переменную
-      2. раскомментировать два закомметированных скрипта в низу файла index.html */
+      2. раскомментировать два закомметированных скрипта в низу файла index.html
+  */
   var reviews;
 
 
@@ -180,31 +177,6 @@
 
 
   /**
-   * 1. Покажем кнопку "Ещё отзывы" если :
-   *      отзывы есть
-   *      и текущая страница < 2
-   *      и текущая страница не является последней
-   * 2. Включаем обработку скроллинга, если :
-   *      текущая страница > 1
-   *      и текущая страница не последняя
-   * @param {number} reviewsCount  количество отзывов, которые нужно отобразить
-   */
-  var enableBtnOrScroll = function (reviewsCount) {
-    if (reviewsCount > 0 && currentPage < 2 && currentPage < filteredPagesCount - 1) {
-      btnShowMore.classList.remove('invisible');
-    } else {
-      btnShowMore.classList.add('invisible');
-
-      /* обработка скроллинга*/
-      if (currentPage < filteredPagesCount - 1) {
-        window.addEventListener('scroll', scrollProcessing);
-      }
-    }
-  }
-
-
-
-  /**
    * Вывод данных на страницу
    * @param {Array} reviewsToRender  Массив объектов (отзывов), которые нужно вывести на страницу
    * @param {boolean=} isAppendMode  Режим добавления новых отзывов или предварительно чистим контейнер
@@ -213,13 +185,15 @@
     if (!isAppendMode) {
       reviewsList.innerHTML = '';
     }
-
-    /* отрежем отзывы для текущей страницы */
+    /* отрежем отзывы текущей страницы */
     reviewsToRender = reviewsToRender.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
-
-    /* включаем или кнопку или скроллинг */
-    enableBtnOrScroll(reviewsToRender.length);
-
+    /* покажем кнопку "Ещё отзывы" если :
+        - отзывы есть
+        - текущая страница < 2
+        - текущая страница не является последней  */
+    if (reviewsToRender.length > 0 && currentPage < 2 && currentPage < filteredPagesCount - 1) {
+      btnShowMore.classList.remove('invisible');
+    }
     /* выводим на страницу */
     reviewsToRender.forEach(function(review) {
       reviewsList.appendChild(createNewElement(review));
@@ -231,10 +205,7 @@
 
 
 
-  /**
-   * Переключение фильтров
-   * @param {string} filterId  id-шник кликнутого радио-инпута
-   */
+  /* переключение фильтров */
   var setActiveFilter = function(filterId) {
     if (activeFilterId === filterId) {
       return;
@@ -242,6 +213,7 @@
 
     currentPage = 0;
     window.removeEventListener('scroll', scrollProcessing);
+    btnShowMore.classList.add('invisible');
 
     switch (filterId) {
       case 'reviews-all':
@@ -325,23 +297,26 @@
    * Функция обработки скроллинга
    */
   var scrollProcessing = function() {
-    if (!scrollTimeout) {
-      var footerCoordinates = footer.getBoundingClientRect();
-      if (footerCoordinates.top - window.innerHeight <= footerCoordinates.height) {
-        showNextPage();
-      }
-      /* throttle - проредим срабатывание события onscroll */
-      scrollTimeout = setTimeout(function() {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = null;
-      }, TIMEOUT_SCROLL);
+    var footerCoordinates = footer.getBoundingClientRect();
+    var viewportHeight = window.innerHeight;
+    if (footerCoordinates.top - viewportHeight <= footerCoordinates.height) {
+      showNextPage();
     }
   }
 
 
 
   /*** Обработка клика по кнопке "Еще отзывы" */
-  btnShowMore.addEventListener('click', showNextPage);
+  btnShowMore.addEventListener('click', function() {
+    /* покажем след. страницу */
+    showNextPage();
+    /* после второго клика спрячем кнопку, далее вывод новых страниц по скроллингу */
+    if (currentPage > 1) {
+      btnShowMore.classList.add('invisible');
+      /* обработка скроллинга */
+      window.addEventListener('scroll', scrollProcessing);
+    }
+  });
 
 
 

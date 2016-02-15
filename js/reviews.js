@@ -1,3 +1,5 @@
+/* global Review */
+
 'use strict';
 
 (function() {
@@ -143,8 +145,8 @@
    */
   var renderReviews = function(reviewsToRender, isAppendMode) {
     if (!isAppendMode) {
-      var reviews = reviewsList.querySelectorAll('.review');
-      [].forEach.call(reviews, function(item) {
+      var reviewElements = reviewsList.querySelectorAll('.review');
+      [].forEach.call(reviewElements, function(item) {
         reviewsList.removeChild(item);
       });
     }

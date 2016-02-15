@@ -1,4 +1,6 @@
-﻿(function() {
+'use strict';
+
+(function() {
   // 10 сек. таймаут загрузки картинки
   var TIMEOUT_IMAGE = 10000;
   var IMAGE_SIZE = 124;
@@ -15,17 +17,17 @@
 
 
   /**
-   * Получаем конткнт шаблона
+   * Получаем контент шаблона
    * @param {Element} template  шаблон
    * @return {Element}
    */
-  var getTemplateContent = function(template) {
+  function getTemplateContent(template) {
     if ('content' in template) {
       return template.content.children[0];
     } else {
       return template.children[0];
     }
-  };
+  }
 
 
 
@@ -38,7 +40,7 @@
     _data = data;
     this.pictureLoad = this.pictureLoad.bind(this);
     this.pictureLoadError = this.pictureLoadError.bind(this);
-  };
+  }
 
 
 
@@ -67,7 +69,7 @@
    */
   Review.prototype.render = function() {
     var reviewTemplate = document.querySelector('#review-template');
-    this._timeout;
+    this._timeout = null;
     this._img = {};
 
     this.element = getTemplateContent(reviewTemplate).cloneNode(true);
@@ -91,7 +93,7 @@
     this._img.title = _data.author.name;
     this._img.alt = _data.author.name;
     this._img.classList.add('review-author');
-  }
+  };
 
 
 

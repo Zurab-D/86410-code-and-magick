@@ -1,6 +1,7 @@
 'use strict';
 
 (function() {
+
   /**
    * Конструктор галереи
    * @constructor
@@ -10,7 +11,7 @@
     this._onCloseClick = this._onCloseClick.bind(this);
     this._onDocumentKeyDown = this._onDocumentKeyDown.bind(this);
     this._onControlsClick = this._onControlsClick.bind(this);
-    console.log('Gallery()');
+    //console.log('Gallery()');
   }
 
 

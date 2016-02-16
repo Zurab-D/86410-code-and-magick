@@ -130,6 +130,18 @@
 </script>
 <script src="https://up.htmlacademy.ru/assets/js_intensive/jsonp/reviews.js"></script>
 -->
+
+<script src="js/msg.js"></script>
+<script>
+  /* если подключен объект msg то используем его, иначе вывод в консоль * /
+  if (typeof(msg) != 'undefined') {
+    console.log2 = console.log;
+    console.log = function(par) {
+      msg.show(par);
+    }
+  } */
+</script>
+
 <script src="js/lib/cookies.js"></script>
 <script src="js/form.js"></script>
 <script src="js/game.js"></script>
@@ -137,6 +149,7 @@
 <script src="js/gallery-init.js"></script>
 <script src="js/review.js"></script>
 <script src="js/reviews.js"></script>
+
 
 </body>
 </html>

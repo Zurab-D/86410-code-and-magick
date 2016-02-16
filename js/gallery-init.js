@@ -11,7 +11,8 @@
    */
   var galImages = document.querySelectorAll('.photogallery-image');
   [].forEach.call(galImages, function(item) {
-    item.addEventListener('click', function() {
+    item.addEventListener('click', function(evt) {
+      evt.preventDefault();
       gallery.show();
     });
   });

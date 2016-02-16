@@ -1,3 +1,5 @@
+'use strict';
+
 (function() {
 
   function Msg(width, height, top, left, right, opacity, font, color, backgroundColor, padding) {
@@ -16,7 +18,7 @@
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseUp = this.onMouseUp.bind(this);
     this.moveAt = this.moveAt.bind(this);
-  };
+  }
 
 
 
@@ -24,7 +26,7 @@
     this.textElem.innerHTML = this.textElem.innerHTML + (this.textElem.innerHTML ? '<br>' : '') +
       this.getTimeStr() + ' > ' + text;
     this.textContainer.scrollTop = 9999999999999;
-  }
+  };
 
 
 
@@ -57,7 +59,6 @@
     this.elem.appendChild(this.textContainer);
     this.elem.appendChild(this.closeBtn);
 
-
     this.elem.style.position = 'fixed';
     this.elem.style.zIndex = 1000;
     this.elem.style.display = 'block';
@@ -70,7 +71,8 @@
     this.elem.style.padding = this.padding;
     this.elem.style.cursor = 'default';
     this.textContainer.style.overflowY = 'scroll';
-    this.textContainer.style.maxHeight = parseInt(this.height) - parseInt(this.elem.style.paddingTop) - parseInt(this.elem.style.paddingBottom) - parseInt(this.elem.style.borderWidth) * 2 + 'px';
+    this.textContainer.style.maxHeight = parseInt(this.height, 10) - parseInt(this.elem.style.paddingTop, 10) -
+      parseInt(this.elem.style.paddingBottom, 10) - parseInt(this.elem.style.borderWidth, 10) * 2 + 'px';
     this.textOutput(text);
     document.body.appendChild(this.elem);
     if (this.left) {
@@ -91,19 +93,19 @@
   Msg.prototype.getTimeStr = function() {
     var d = new Date();
     return d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ' ' + d.getMilliseconds();
-  }
+  };
 
 
 
   Msg.prototype.hide = function() {
     this.elem.style.display = 'none';
-  }
+  };
 
 
 
   Msg.prototype.show = function(text) {
     if (this.elem) {
-      if (this.elem.style.display == 'none') {
+      if (this.elem.style.display === 'none') {
         this.elem.style.display = 'block';
       }
       if (text) {
@@ -113,29 +115,31 @@
       this.create(text);
     }
     this.closeBtn.addEventListener('click', this.hide);
-  }
+  };
 
 
   /* перетаскивание недоделано (нужно перехватывать скроллинг и не пропускать его выше) */
   Msg.prototype.moveAt = function(evt) {
     this.elem.style.top = evt.clientY - this.cursorElemY + 'px';
-    this.elem.style.left = evt.clientX - this.cursorElemX +'px';
-  }
+    this.elem.style.left = evt.clientX - this.cursorElemX + 'px';
+  };
+
   Msg.prototype.onMouseDown = function(evt) {
     if (evt.target !== this.closeBtn && evt.target !== this.textContainer && evt.target !== this.textElem ) {
-      this.cursorElemX = (evt.offsetX==undefined) ? evt.layerX : evt.offsetX;
-      this.cursorElemY = (evt.offsetY==undefined) ? evt.layerY : evt.offsetY;
+      this.cursorElemX = (typeof evt.offsetX === 'undefined') ? evt.layerX : evt.offsetX;
+      this.cursorElemY = (typeof evt.offsetY === 'undefined') ? evt.layerY : evt.offsetY;
       this.elem.style.cursor = 'pointer';
       this.moveAt(evt);
       document.onmousemove = this.moveAt;
       this.elem.onmouseup = this.onMouseUp;
     }
-  }
+  };
+
   Msg.prototype.onMouseUp = function() {
     this.elem.style.cursor = 'default';
     document.onmousemove = null;
     this.elem.onmouseup = null;
-  }
+  };
 
 
 
@@ -149,7 +153,8 @@
 
 
 /* Переопределим поведение console.log */
+/* global msg */
 console.log2 = console.log;
 console.log = function(par) {
   msg.show(par);
-}
+};

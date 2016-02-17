@@ -818,10 +818,61 @@
     }
   };
 
+
+
   window.Game = Game;
   window.Game.Verdict = Verdict;
 
   var game = new Game(document.querySelector('.demo'));
   game.initializeLevelAndStart();
   game.setGameStatus(window.Game.Verdict.INTRO);
+
+
+  /**
+   * Параллакс эффект для облаков при прокрутке страницы и останов игры, когда ее не видно
+   */
+  (function() {
+    var header = document.querySelector('header');
+    var clouds = document.querySelector('.header-clouds');
+    var headerHeight = header.getBoundingClientRect().height;
+    var timeoutParallax;
+    // флаг разрешения параллакс-эффекта для облаков
+    var canDoParallax = true;
+    // Таймаут проверки допустимости параллакса
+    var TIMEOUT_PARALLAX = 100;
+    // блок с игрой
+    var demo = document.querySelector('.demo');
+
+    /* Проверки:
+          включения/выключения флага параллакса
+          и остановки игры */
+    function checkGameActivities() {
+      if (!timeoutParallax) {
+        // пауза между проверками
+        timeoutParallax = setTimeout(function() {
+          clearTimeout(timeoutParallax);
+          timeoutParallax = null;
+        }, TIMEOUT_PARALLAX);
+        // параллакс
+        canDoParallax = clouds.getBoundingClientRect().bottom > 0;
+        // стоп игра
+        if ((demo.getBoundingClientRect().bottom < 0) || (demo.getBoundingClientRect().top > window.innerHeight)) {
+          game.setGameStatus(window.Game.Verdict.PAUSE);
+        }
+      }
+    }
+
+    window.addEventListener('scroll', function() {
+      /* Выполним проверки */
+      checkGameActivities();
+
+      /* сдвигаем облака по горизонтали пропорционально сдвигу хедера в верх (вычисляем процент сдвига вверх и умножаем на 2 для наглядности)
+         результат вычисления округляем до 3 знаков после запятой ( ... * 1000) / 1000 ) */
+      if (canDoParallax) {
+        var headerTop = header.getBoundingClientRect().top;
+        clouds.style.backgroundPositionX = (50 + Math.round((headerTop * 200 / headerHeight) * 1000) / 1000) + '%';
+        console.log(Date.now()); // - для наглядности включения/выключения флага параллакса раскомментировать эту строку
+      }
+    });
+  })();
 })();

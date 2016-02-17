@@ -871,7 +871,7 @@
       if (canDoParallax) {
         var headerTop = header.getBoundingClientRect().top;
         clouds.style.backgroundPositionX = (50 + Math.round((headerTop * 200 / headerHeight) * 1000) / 1000) + '%';
-        console.log(Date.now()); // - для наглядности включения/выключения флага параллакса раскомментировать эту строку
+        //console.log(Date.now()); // - для наглядности включения/выключения флага параллакса раскомментировать эту строку
       }
     });
   })();

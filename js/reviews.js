@@ -1,10 +1,11 @@
+/* global Review */
+
 'use strict';
 
 (function() {
   var URL_AJAX = 'http://o0.github.io/assets/json/reviews.json';
   var reviewsList = document.querySelector('.reviews-list');
   var reviewsFilter = document.querySelector('.reviews-filter');
-  var ratingClasses = ['one', 'two', 'three', 'four', 'five'];
   var filterControls = document.forms[0].querySelectorAll('input[name="reviews"]');
   var btnShowMore = document.querySelector('.reviews-controls-more');
   var footer = document.querySelector('footer');
@@ -24,73 +25,6 @@
       2. раскомментировать два закомметированных скрипта в низу файла index.html */
   var reviews;
 
-
-
-  /**
-   * Получаем содержимое шаблона
-   * @param {Element} template  шаблон
-   * @return {Element}
-   */
-  var getTemplateContent = function(template) {
-    if ('content' in template) {
-      return template.content.children[0];
-    } else {
-      return template.children[0];
-    }
-  };
-
-
-
-  /**
-   * Создаем новый элемент (пользовательский отзыв) для последующего вывода на страницу
-   * @param {Object} review  данные пользовательского отзыва
-   * @return {Element}  созданный элеиент
-   */
-  var createNewElement = function(review) {
-    var TIMEOUT_IMAGE = 10000; /* 10 сек. */
-    var IMAGE_SIZE = 124;
-    var reviewTemplate = document.querySelector('#review-template');
-    var clone;
-    var img = {};
-    var timeout;
-
-    /* обработка ошибки загрузки картинки */
-    function errorLoadImage() {
-      clone.classList.add('review-load-failure');
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    }
-
-    clone = getTemplateContent(reviewTemplate).cloneNode(true);
-    clone.querySelector('.review-text').textContent = review.description;
-    clone.querySelector('.review-rating').classList.add('review-rating-' + ratingClasses[review.rating - 1]);
-
-    /* создаем объект-картинку */
-    img = new Image(IMAGE_SIZE, IMAGE_SIZE);
-
-    /* при загрузке созданной картинки вставим ее в элемент */
-    img.onload = function() {
-      clone.replaceChild(img, clone.querySelector('.review-author'));
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-    };
-
-    /* при ошибке загрузке картинки, назначаем элементу соотв. класс */
-    img.onerror = errorLoadImage;
-
-    /* взводим таймаут, по которому назначим картинку ошибки загрузки */
-    timeout = setTimeout(errorLoadImage, TIMEOUT_IMAGE);
-
-    /* начинаем загрузку картинки */
-    img.src = review.author.picture;
-    img.title = review.author.name;
-    img.alt = review.author.name;
-    img.classList.add('review-author');
-
-    return clone;
-  };
 
 
 
@@ -211,7 +145,10 @@
    */
   var renderReviews = function(reviewsToRender, isAppendMode) {
     if (!isAppendMode) {
-      reviewsList.innerHTML = '';
+      var reviewElements = reviewsList.querySelectorAll('.review');
+      [].forEach.call(reviewElements, function(item) {
+        reviewsList.removeChild(item);
+      });
     }
 
     /* отрежем отзывы для текущей страницы */
@@ -222,7 +159,9 @@
 
     /* выводим на страницу */
     reviewsToRender.forEach(function(review) {
-      reviewsList.appendChild(createNewElement(review));
+      var reviewElement = new Review(review);
+      reviewElement.render();
+      reviewsList.appendChild(reviewElement.element);
     });
 
     /* прячем сообщение о начале загрузки */

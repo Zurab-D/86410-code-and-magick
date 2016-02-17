@@ -6,13 +6,22 @@
   var reviewsFilter = document.querySelector('.reviews-filter');
   var ratingClasses = ['one', 'two', 'three', 'four', 'five'];
   var filterControls = document.forms[0].querySelectorAll('input[name="reviews"]');
+  var btnShowMore = document.querySelector('.reviews-controls-more');
+  var footer = document.querySelector('footer');
   var activeFilterId;
+  var filteredReviews;
+  var filteredPagesCount;
+  // кол-во отзывов выводимых за раз (по кнопке "Ещё", по скролу)
+  var PAGE_SIZE = 3;
+  var currentPage = 0;
+  var scrollTimeout;
+  // таймаут прореживания события onscroll
+  var TIMEOUT_SCROLL = 10;
 
   /* Эта переменная нужна только при работе по AJAX,
      для работы по JSONP  нужно:
       1. закомментировать эту переменную
-      2. раскомментировать два закомметированных скрипта в низу файла index.html
-  */
+      2. раскомментировать два закомметированных скрипта в низу файла index.html */
   var reviews;
 
 
@@ -171,10 +180,47 @@
 
 
   /**
-   * Вывод данных на страницу
+   * 1. Покажем кнопку "Ещё отзывы" если :
+   *      отзывы есть
+   *      и текущая страница < 2
+   *      и текущая страница не является последней
+   * 2. Включаем обработку скроллинга, если :
+   *      текущая страница > 1
+   *      и текущая страница не последняя
+   * @param {number} reviewsCount  количество отзывов, которые нужно отобразить
    */
-  var renderReviews = function(reviewsToRender) {
-    reviewsList.innerHTML = '';
+  var enableBtnOrScroll = function(reviewsCount) {
+    if (reviewsCount > 0 && currentPage < 2 && currentPage < filteredPagesCount - 1) {
+      btnShowMore.classList.remove('invisible');
+    } else {
+      btnShowMore.classList.add('invisible');
+
+      /* обработка скроллинга*/
+      if (currentPage < filteredPagesCount - 1) {
+        window.addEventListener('scroll', scrollProcessing);
+      }
+    }
+  };
+
+
+
+  /**
+   * Вывод данных на страницу
+   * @param {Array} reviewsToRender  Массив объектов (отзывов), которые нужно вывести на страницу
+   * @param {boolean=} isAppendMode  Режим добавления новых отзывов или предварительно чистим контейнер
+   */
+  var renderReviews = function(reviewsToRender, isAppendMode) {
+    if (!isAppendMode) {
+      reviewsList.innerHTML = '';
+    }
+
+    /* отрежем отзывы для текущей страницы */
+    reviewsToRender = reviewsToRender.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
+
+    /* включаем или кнопку или скроллинг */
+    enableBtnOrScroll(reviewsToRender.length);
+
+    /* выводим на страницу */
     reviewsToRender.forEach(function(review) {
       reviewsList.appendChild(createNewElement(review));
     });
@@ -185,14 +231,17 @@
 
 
 
-
-  /* переключение фильтров */
+  /**
+   * Переключение фильтров
+   * @param {string} filterId  id-шник кликнутого радио-инпута
+   */
   var setActiveFilter = function(filterId) {
     if (activeFilterId === filterId) {
       return;
     }
 
-    var filteredReviews;
+    currentPage = 0;
+    window.removeEventListener('scroll', scrollProcessing);
 
     switch (filterId) {
       case 'reviews-all':
@@ -229,6 +278,7 @@
         });
         break;
     }
+    filteredPagesCount = Math.ceil(filteredReviews.length / PAGE_SIZE);
     renderReviews(filteredReviews);
   };
 
@@ -238,12 +288,12 @@
    * Инициализация activeFilterId и событий перключения фильтра
    */
   var initActiveFilterId = function() {
-    for (var i = 0; i < filterControls.length; i++) {
-      filterControls[i].onclick = function(event) {
-        var filterId = event.target.id;
-        setActiveFilter(filterId);
-      };
-    }
+    reviewsFilter.addEventListener('click', function(event) {
+      var clickedElement = event.target;
+      if (clickedElement.name === 'reviews') {
+        setActiveFilter(clickedElement.id);
+      }
+    });
   };
 
 
@@ -256,6 +306,43 @@
     reviews = JSON.parse(dataJson);
     filterControls[0].click();
   };
+
+
+
+  /**
+   * Функция показа следующей страницы отзывов
+   */
+  var showNextPage = function() {
+    if (currentPage < (filteredPagesCount - 1)) {
+      currentPage++;
+      renderReviews(filteredReviews, true);
+    }
+  };
+
+
+
+  /**
+   * Функция обработки скроллинга
+   */
+  var scrollProcessing = function() {
+    if (!scrollTimeout) {
+      var footerCoordinates = footer.getBoundingClientRect();
+      if (footerCoordinates.top - window.innerHeight <= footerCoordinates.height) {
+        showNextPage();
+      }
+      /* throttle - проредим срабатывание события onscroll */
+      scrollTimeout = setTimeout(function() {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = null;
+      }, TIMEOUT_SCROLL);
+    }
+  };
+
+
+
+  /*** Обработка клика по кнопке "Еще отзывы" */
+  btnShowMore.addEventListener('click', showNextPage);
+
 
 
 

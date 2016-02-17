@@ -146,7 +146,7 @@
   var renderReviews = function(reviewsToRender, isAppendMode) {
     if (!isAppendMode) {
       var reviewElements = reviewsList.querySelectorAll('.review');
-      [].forEach.call(reviewElements, function(item) {
+      Array.prototype.forEach.call(reviewElements, function(item) {
         reviewsList.removeChild(item);
       });
     }

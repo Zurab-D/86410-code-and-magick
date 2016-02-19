@@ -19,7 +19,6 @@ css/*.css
 *.zip
 ex_files
 .gitignore
-Замечания.*
 FarMenu.ini
 *.min.css
 *.min.js

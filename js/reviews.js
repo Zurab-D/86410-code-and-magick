@@ -52,7 +52,6 @@
 
     /* создаем xhr */
     var xhr = new XMLHttpRequest();
-    xhr.timeout = TIMEOUT_XHR;
 
     xhr.ontimeout = function() {
       if (onTimeoutFunc) {
@@ -70,6 +69,7 @@
     };
 
     xhr.open(method, url, true);
+    xhr.timeout = TIMEOUT_XHR;
 
     if (method.toUpperCase() === 'GET') {
       xhr.send();

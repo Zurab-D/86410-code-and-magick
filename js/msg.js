@@ -158,3 +158,14 @@ console.log2 = console.log;
 console.log = function(par) {
   msg.show(par);
 };
+
+/* Замечания:
+  1. в конструктор передавать лишь два параметра, а остальные изменение остальных параметров сделеть через фцнкции-сеттеры
+  2. в методе create() вынести в отдельны еф-ции создание:
+    - elem
+    - closeBtn
+    - caption
+    - textElem
+    - textContainer
+  3. применить throttle к перемещению окна (onmiusemove)
+*/

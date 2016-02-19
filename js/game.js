@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+(function(window) {
   /**
    * @const
    * @type {number}
@@ -875,4 +875,4 @@
       }
     });
   })();
-})();
+})(window);

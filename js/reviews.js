@@ -2,7 +2,7 @@
 
 'use strict';
 
-(function() {
+(function(window) {
   var URL_AJAX = 'http://o0.github.io/assets/json/reviews.json';
   var reviewsList = document.querySelector('.reviews-list');
   var reviewsFilter = document.querySelector('.reviews-filter');
@@ -301,4 +301,4 @@
 
   /* показываем фильтры отзывов */
   reviewsFilter.classList.remove('invisible');
-})();
+})(window);

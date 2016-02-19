@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+(function(window) {
   /**
    * @constructor Photo
    */
@@ -9,4 +9,4 @@
   }
 
   window.Photo = Photo;
-})();
+})(window);

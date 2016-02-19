@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+(function(window) {
   // 10 сек. таймаут загрузки картинки
   var TIMEOUT_IMAGE = 10000;
   var IMAGE_SIZE = 124;
@@ -98,4 +98,4 @@
 
 
   window.Review = Review;
-})();
+})(window);

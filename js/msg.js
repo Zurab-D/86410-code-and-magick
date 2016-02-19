@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+(function(window) {
 
   function Msg(width, height, top, left, right, opacity, font, color, backgroundColor, padding) {
     this.width = width || '40%';
@@ -148,7 +148,7 @@
 
   /* Создаем объект типа Msg в ГОВ */
   window.msg = new Msg();
-})();
+})(window);
 
 
 

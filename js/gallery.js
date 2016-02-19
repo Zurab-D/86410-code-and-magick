@@ -86,7 +86,7 @@
   Gallery.prototype.setPictures = function(photos) {
     this.photos = photos;
     this.totalCount = this.photos.length;
-  }
+  };
 
 
 
@@ -96,7 +96,7 @@
   Gallery.prototype.setCurrentPicture = function(index) {
     this.currentIndex = index;
     var newImage = new Image();
-    newImage.src = this.photos[this.currentIndex].src
+    newImage.src = this.photos[this.currentIndex].src;
 
     var oldImage = this._preview.querySelector('img');
     if (oldImage) {
@@ -104,7 +104,7 @@
     }
     this._preview.appendChild(newImage);
     this._numberCurrentElem.innerText = this.currentIndex + 1;
-  }
+  };
 
 
 
@@ -115,7 +115,7 @@
     if (this.currentIndex > 0) {
       this.setCurrentPicture(this.currentIndex - 1);
     }
-  }
+  };
 
 
 
@@ -126,7 +126,7 @@
     if (this.currentIndex < this.totalCount - 1) {
       this.setCurrentPicture(this.currentIndex + 1);
     }
-  }
+  };
 
 
 
@@ -135,7 +135,7 @@
    */
   Gallery.prototype._onPreviewClick = function() {
     console.log('... Gallery._onPreviewClick');
-  }
+  };
 
 
 

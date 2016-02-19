@@ -1,3 +1,5 @@
+/* global Photo, Gallery */
+
 'use strict';
 
 (function() {

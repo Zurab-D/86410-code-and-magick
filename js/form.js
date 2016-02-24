@@ -151,7 +151,9 @@
     try {
       reviewName.value = docCookies.getItem('name');
       var mark = docCookies.getItem('mark');
-      reviewMarksAll[mark - 1].checked = true;
+      if (!isNaN(parseInt(mark, 10))) {
+        reviewMarksAll[parseInt(mark, 10) - 1].checked = true;
+      }
     } catch (err) {
       console.log('Ошибка ' + err.name + ': ' + err.message);
     }

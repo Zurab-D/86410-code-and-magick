@@ -162,6 +162,31 @@
       var reviewElement = new Review(review);
       reviewElement.render();
       reviewsList.appendChild(reviewElement.element);
+
+      /* голосовалка за/против комментарий */
+      reviewElement.onVote = function(isYesVote) {
+        console.log('reviewElement.onVote :: before :: rating=' + this._data.review_usefulness);
+        isYesVote = (typeof isYesVote === 'undefined') ? 1 : isYesVote;
+        if (isYesVote) {
+          // если уже подан протовоположный голос, плюсуем на два для компенсации
+          if (this.element.querySelector('.review-quiz-answer-no').classList.contains('review-quiz-answer-active')) {
+            this._data.review_usefulness += 2;
+          } else {
+            this._data.review_usefulness += 1;
+          }
+          this.element.querySelector('.review-quiz-answer-yes').classList.add('review-quiz-answer-active');
+          this.element.querySelector('.review-quiz-answer-no').classList.remove('review-quiz-answer-active');
+        } else {
+          if (this.element.querySelector('.review-quiz-answer-yes').classList.contains('review-quiz-answer-active')) {
+            this._data.review_usefulness -= 2;
+          } else {
+            this._data.review_usefulness -= 1;
+          }
+          this.element.querySelector('.review-quiz-answer-no').classList.add('review-quiz-answer-active');
+          this.element.querySelector('.review-quiz-answer-yes').classList.remove('review-quiz-answer-active');
+        }
+        console.log('reviewElement.onVote :: after :: rating=' + this._data.review_usefulness);
+      };
     });
 
     /* прячем сообщение о начале загрузки */
@@ -211,7 +236,7 @@
         });
         break;
       case 'reviews-popular':
-        // Популярные — отсортированные по убыванию оценки отзыва (поле reviewRating)
+        // Популярные — отсортированные по убыванию оценки отзыва (поле review_usefulness)
         filteredReviews = reviews.slice(0).sort(function(a, b) {
           return b['review_usefulness'] - a['review_usefulness'];
         });
@@ -257,6 +282,13 @@
       renderReviews(filteredReviews, true);
     }
   };
+
+
+
+  /**
+   *
+   * /
+  var*/
 
 
 

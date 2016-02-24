@@ -11,8 +11,6 @@
     'four',
     'five'
   ];
-  // данные полученные по аяксу по текущему отзыву
-  var _data;
 
 
 
@@ -37,9 +35,10 @@
    * @construstor
    */
   function Review(data) {
-    _data = data;
+    this._data = data;
     this.pictureLoad = this.pictureLoad.bind(this);
     this.pictureLoadError = this.pictureLoadError.bind(this);
+    this._onClick = this._onClick.bind(this);
   }
 
 
@@ -73,8 +72,8 @@
     this._img = {};
 
     this.element = getTemplateContent(reviewTemplate).cloneNode(true);
-    this.element.querySelector('.review-text').textContent = _data.description;
-    this.element.querySelector('.review-rating').classList.add('review-rating-' + _ratingClasses[_data.rating - 1]);
+    this.element.querySelector('.review-text').textContent = this._data.description;
+    this.element.querySelector('.review-rating').classList.add('review-rating-' + _ratingClasses[this._data.rating - 1]);
 
     // создаем объект-картинку
     this._img = new Image(IMAGE_SIZE, IMAGE_SIZE);
@@ -89,11 +88,38 @@
     this._timeout = setTimeout(this.pictureLoadError, TIMEOUT_IMAGE);
 
     // начинаем загрузку картинки
-    this._img.src = _data.author.picture;
-    this._img.title = _data.author.name;
-    this._img.alt = _data.author.name;
+    this._img.src = this._data.author.picture;
+    this._img.title = this._data.author.name;
+    this._img.alt = this._data.author.name;
     this._img.classList.add('review-author');
+
+    this.element.addEventListener('click', this._onClick);
   };
+
+
+
+  /**
+   * @param {Event} evt
+   * @private
+   */
+  Review.prototype._onClick = function(evt) {
+    if (typeof this.onVote === 'function') {
+      // накрутить голоса не так уж и легко
+      if (!evt.target.classList.contains('review-quiz-answer-active')) {
+        if (evt.target.classList.contains('review-quiz-answer-yes')) {
+          this.onVote(true);
+        }
+        if (evt.target.classList.contains('review-quiz-answer-no')) {
+          this.onVote(false);
+        }
+      }
+    }
+  };
+
+
+
+  /** @type {?Function} */
+  Review.prototype.onVote = null;
 
 
 

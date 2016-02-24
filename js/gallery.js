@@ -1,6 +1,10 @@
 'use strict';
 
 (function(window) {
+  /* клавиша Escape */
+  var KEY_ESCAPE = 27;
+  var KEY_LEFT = 37;
+  var KEY_RIGHT = 39;
 
   /**
    * Конструктор галереи
@@ -56,8 +60,16 @@
    * Функция обработки клавиатуры
    */
   Gallery.prototype._onDocumentKeyDown = function() {
-    if (event.keyCode === 27) {
-      this.hide();
+    switch (event.keyCode) {
+      case KEY_ESCAPE:
+        this.hide();
+        break;
+      case KEY_LEFT:
+        this._onControlLeft();
+        break;
+      case KEY_RIGHT:
+        this._onControlRight();
+        break;
     }
   };
 

@@ -4,7 +4,7 @@
 
   function Msg(width, height, top, left, right, opacity, font, color, backgroundColor, padding) {
     this.width = width || '40%';
-    this.height = height || '100px';
+    this.height = height || '200px';
     this.top = top || '2px';
     this.left = left || null;
     this.right = right || null;

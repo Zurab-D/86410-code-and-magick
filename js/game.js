@@ -1,6 +1,8 @@
+/* global define */
+
 'use strict';
 
-(function(window) {
+define([], function() {
   /**
    * @const
    * @type {number}
@@ -374,6 +376,15 @@
       }
     },
 
+
+    /**
+     * Показ сообщения в канвасе
+     * @param {string} msgText
+     * @param {number} x
+     * @param {number} y
+     * @param {number} rectWidth
+     * @param {boolean=} boxIsRectangle
+     */
     showMyMessage: function(msgText, x, y, rectWidth, boxIsRectangle) {
       boxIsRectangle = typeof boxIsRectangle === 'boolean' && boxIsRectangle;
 
@@ -875,4 +886,4 @@
       }
     });
   })();
-})(window);
+});

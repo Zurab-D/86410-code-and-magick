@@ -1,6 +1,8 @@
+/* global define */
+
 'use strict';
 
-(function(window) {
+define([], function() {
   /* клавиша Escape */
   var KEY_ESCAPE = 27;
   var KEY_LEFT = 37;
@@ -8,6 +10,7 @@
 
   /**
    * Конструктор галереи
+   * @param {Array.<Object>} photos  Массив объектов фотографий
    * @constructor
    */
   function Gallery(photos) {
@@ -151,12 +154,8 @@
 
 
 
-
-  /**
-   * Прокидываем тип галареи в ГОВ
-   */
-  window.Gallery = Gallery;
-})(window);
+  return Gallery;
+});
 
 /* Замечания:
   1. классы ДОМ-элементов заданы жестко - это нехорошо. Решения:

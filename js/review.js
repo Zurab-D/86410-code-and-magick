@@ -1,9 +1,27 @@
+/* global define */
+
 'use strict';
 
-(function(window) {
-  // 10 сек. таймаут загрузки картинки
+
+define([], function() {
+  /**
+   * Таймаут загрузки картинки - 10 сек.
+   * @const
+   * @type {number}
+   */
   var TIMEOUT_IMAGE = 10000;
+
+  /**
+   * Размер картинки
+   * @const
+   * @type {number}
+   */
   var IMAGE_SIZE = 124;
+
+  /**
+   * Суффиксы css-классов рейтингов
+   * @enum {number}
+   */
   var _ratingClasses = [
     'one',
     'two',
@@ -99,6 +117,7 @@
 
 
   /**
+   * Обработка кликов за/против комментарий
    * @param {Event} evt
    * @private
    */
@@ -123,5 +142,5 @@
 
 
 
-  window.Review = Review;
-})(window);
+  return Review;
+});

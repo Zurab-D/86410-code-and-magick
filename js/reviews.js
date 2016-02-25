@@ -1,9 +1,17 @@
-/* global Review */
+/* global define */
 
 'use strict';
 
-(function(window) {
+define([
+  'review'
+], function(Review) {
+  /**
+   * Адрес для AJAX
+   * @const
+   * @type {string}
+   */
   var URL_AJAX = 'http://o0.github.io/assets/json/reviews.json';
+
   var reviewsList = document.querySelector('.reviews-list');
   var reviewsFilter = document.querySelector('.reviews-filter');
   var filterControls = document.forms[0].querySelectorAll('input[name="reviews"]');
@@ -12,17 +20,30 @@
   var activeFilterId;
   var filteredReviews;
   var filteredPagesCount;
-  // кол-во отзывов выводимых за раз (по кнопке "Ещё", по скролу)
+
+  /**
+   * кол-во отзывов выводимых за раз (по кнопке "Ещё", по скролу)
+   * @const
+   * @type {number}
+   */
   var PAGE_SIZE = 3;
   var currentPage = 0;
   var scrollTimeout;
-  // таймаут прореживания события onscroll
+
+  /**
+   * Таймаут прореживания события onscroll
+   * @const
+   * @type {number}
+   */
   var TIMEOUT_SCROLL = 10;
 
-  /* Эта переменная нужна только при работе по AJAX,
-     для работы по JSONP  нужно:
-      1. закомментировать эту переменную
-      2. раскомментировать два закомметированных скрипта в низу файла index.html */
+  /**
+   * Эта переменная нужна только при работе по AJAX,
+   * для работы по JSONP  нужно:
+   *    1. закомментировать эту переменную
+   *  2. раскомментировать два закомметированных скрипта в низу файла index.html
+   * @type {?Array.<Object>}
+   */
   var reviews;
 
 
@@ -286,13 +307,6 @@
 
 
   /**
-   *
-   * /
-  var*/
-
-
-
-  /**
    * Функция обработки скроллинга
    */
   var scrollProcessing = function() {
@@ -333,4 +347,4 @@
 
   /* показываем фильтры отзывов */
   reviewsFilter.classList.remove('invisible');
-})(window);
+});

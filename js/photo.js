@@ -1,6 +1,8 @@
+/* global define */
+
 'use strict';
 
-(function(window) {
+define([], function() {
   /**
    * @constructor Photo
    */
@@ -13,19 +15,19 @@
     newImage.src = this.src;
   };
 
-  window.Photo = Photo;
-})(window);
+  return Photo;
+});
 
 /* global Photo */
-//data-replacement-video
-(function() {
-  /**
-   * @constructor Video
-   */
-  function Video() {
-    Photo.apply(this, arguments);
-  }
-
-  Video.prototype.render = function() {
-  };
-})();
+////data-replacement-video
+//(function() {
+//  /**
+//   * @constructor Video
+//   */
+//  function Video() {
+//    Photo.apply(this, arguments);
+//  }
+//
+//  Video.prototype.render = function() {
+//  };
+//})();

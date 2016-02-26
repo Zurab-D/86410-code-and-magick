@@ -217,6 +217,29 @@ define([
 
 
   /**
+   * Порядковый номер фильтра
+   * @param {string} filterId  id-шник кликнутого радио-инпута
+   * @return {?number}
+   */
+  var getFilterIndex = function(filterId) {
+    switch (filterId) {
+      case 'reviews-all':
+        return 0;
+      case 'reviews-recent':
+        return 1;
+      case 'reviews-good':
+        return 2;
+      case 'reviews-bad':
+        return 3;
+      case 'reviews-popular':
+        return 4;
+    }
+    return 0;
+  };
+
+
+
+  /**
    * Переключение фильтров
    * @param {string} filterId  id-шник кликнутого радио-инпута
    */
@@ -228,11 +251,11 @@ define([
     currentPage = 0;
     window.removeEventListener('scroll', scrollProcessing);
 
-    switch (filterId) {
-      case 'reviews-all':
+    switch (getFilterIndex(filterId)) {
+      case 0:
         filteredReviews = reviews.slice(0);
         break;
-      case 'reviews-recent':
+      case 1:
         /* дата <= 14 дней недели */
         filteredReviews = reviews.filter(function(review) {
           return new Date(review.date) > new Date(Date.now() - 1000 * 60 * 60 * 24 * 14);
@@ -240,7 +263,7 @@ define([
           return b.date - a.date;
         });
         break;
-      case 'reviews-good':
+      case 2:
         // Хорошие — с рейтингом не ниже 3, отсортированные по убыванию рейтинга
         filteredReviews = reviews.filter(function(review) {
           return review.rating >= 3;
@@ -248,7 +271,7 @@ define([
           return b.rating - a.rating;
         });
         break;
-      case 'reviews-bad':
+      case 3:
         // Плохие — с рейтингом не выше 2, отсортированные по возрастанию рейтинга.
         filteredReviews = reviews.filter(function(review) {
           return review.rating <= 2;
@@ -256,7 +279,7 @@ define([
           return a.rating - b.rating;
         });
         break;
-      case 'reviews-popular':
+      case 4:
         // Популярные — отсортированные по убыванию оценки отзыва (поле review_usefulness)
         filteredReviews = reviews.slice(0).sort(function(a, b) {
           return b['review_usefulness'] - a['review_usefulness'];
@@ -265,6 +288,7 @@ define([
     }
     filteredPagesCount = Math.ceil(filteredReviews.length / PAGE_SIZE);
     renderReviews(filteredReviews);
+    localStorage.setItem('filterId', filterId);
   };
 
 
@@ -289,7 +313,8 @@ define([
    */
   var renderReviewsJson = function(dataJson) {
     reviews = JSON.parse(dataJson);
-    filterControls[0].click();
+    var filterIndex = getFilterIndex(localStorage.getItem('filterId'));
+    filterControls[filterIndex].click();
   };
 
 

@@ -32,11 +32,12 @@ define([
    * Вешаем на клики по картинкам вызов фотогалереи
    */
   var galImages = document.querySelectorAll('.photogallery-image');
-  Array.prototype.forEach.call(galImages, function(itmage, i) {
-    itmage.addEventListener('click', function(evt) {
+  Array.prototype.forEach.call(galImages, function(image, i) {
+    image.addEventListener('click', function(evt) {
       evt.preventDefault();
-      gallery.setCurrentPicture(i);
-      gallery.show();
+      location.hash = '#photo/' + gallery.photos[i].src;
+      gallery.restoreFromHash();
     });
+    gallery.restoreFromHash();
   });
 });

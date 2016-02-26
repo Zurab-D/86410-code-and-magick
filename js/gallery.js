@@ -171,6 +171,7 @@ define([
       this.currentIndex = currentPic;
       var newImage = new Image();
       newImage.src = this.photos[this.currentIndex].src;
+      newImage.style.pointerEvents = 'none';
 
       var oldImage = this.domPreview.element.querySelector('img');
       if (oldImage) {

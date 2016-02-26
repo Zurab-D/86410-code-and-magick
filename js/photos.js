@@ -24,7 +24,6 @@ define([
    * @type {Object}
    */
   var gallery = new Gallery(photos);
-  //gallery.setPictures(photos);
 
 
 

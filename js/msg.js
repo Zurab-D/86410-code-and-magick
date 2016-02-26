@@ -1,6 +1,8 @@
+/* global define */
+
 'use strict';
 
-(function(window) {
+define([], function() {
 
   function Msg(width, height) {
     this.hide = this.hide.bind(this);
@@ -29,13 +31,12 @@
     this.setTextBgColor('lightyellow');
     this.setBorder('1px solid green');
     this.setCaptionFont('italic 15px Arial');
-
-    //this.applyParams();
-
   }
 
 
+
   var p = Msg.prototype;
+
 
 
   function isString(obj) {
@@ -263,31 +264,5 @@
     this.elem.onmouseup = null;
   };
 
-
-
-  /* Прокидываем тип в ГОВ */
-  //window.Msg = Msg;
-
-  /* Создаем объект типа Msg в ГОВ */
-  window.msg = new Msg();
-})(window);
-
-
-
-/* Переопределим поведение console.log */
-/* global msg */
-console.log2 = console.log;
-console.log = function(par) {
-  msg.show(par);
-};
-
-/* Замечания:
-  1. в конструктор передавать лишь два параметра, а остальные изменение остальных параметров сделеть через фцнкции-сеттеры
-  2. в методе create() вынести в отдельные ф-ции создание:
-    - elem
-    - closeBtn
-    - caption
-    - textElem
-    - textContainer
-  3. применить throttle к перемещению окна (onmiusemove)
-*/
+  return Msg;
+});

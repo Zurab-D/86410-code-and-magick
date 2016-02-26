@@ -1,10 +1,8 @@
-/* global define */
+/* global define, docCookies */
 
 'use strict';
 
-define([
-  'lib\cookies'
-], function(docCookies) {
+define([], function() {
   var formContainer = document.querySelector('.overlay-container');
   var formOpenButton = document.querySelector('.reviews-controls-new');
   var formCloseButton = document.querySelector('.review-form-close');

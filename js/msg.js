@@ -35,6 +35,8 @@
   }
 
 
+  var p = Msg.prototype;
+
 
   function isString(obj) {
     var op = Object.prototype.toString.call(obj);
@@ -44,13 +46,13 @@
 
 
   /** Функции-сеттеры для изиенения параметров */
-  Msg.prototype.setTop = function(param) {
+  p.setTop = function(param) {
     if (isString(param)) {
       this.elem.style.top = param;
       this.setHorizontalPosition();
     }
-  }
-  Msg.prototype.setHorizontalPosition = function(param) {
+  };
+  p.setHorizontalPosition = function() {
     if (this.left) {
       this.elem.style.left = this.left;
     } else if (this.right) {
@@ -58,78 +60,78 @@
     } else {
       this.elem.style.left = this.elem.style.top;
     }
-  }
-  Msg.prototype.setLeft = function(param) {
+  };
+  p.setLeft = function(param) {
     if (isString(param)) {
       this.left = param;
       this.setHorizontalPosition();
     }
-  }
-  Msg.prototype.setRight = function(param) {
+  };
+  p.setRight = function(param) {
     if (isString(param)) {
       this.right = param;
       this.setHorizontalPosition();
     }
-  }
-  Msg.prototype.setHeight = function(param) {
+  };
+  p.setHeight = function(param) {
     if (isString(param)) {
       this.height = param;
       this._setTextContainerStyle();
     }
-  }
-  Msg.prototype.setWidth = function(param) {
+  };
+  p.setWidth = function(param) {
     if (isString(param)) {
       this.elem.style.width = param;
     }
-  }
-  Msg.prototype.setOpacity = function(param) {
+  };
+  p.setOpacity = function(param) {
     if (isString(param)) {
       this.elem.style.opacity = param;
     }
-  }
-  Msg.prototype.setFont = function(param) {
+  };
+  p.setFont = function(param) {
     if (isString(param)) {
       this.textElem.style.font = param;
     }
-  }
-  Msg.prototype.setCaptionFont = function(param) {
+  };
+  p.setCaptionFont = function(param) {
     if (isString(param)) {
       this.caption.style.font = param;
     }
-  }
-  Msg.prototype.setBorder = function(param) {
+  };
+  p.setBorder = function(param) {
     if (isString(param)) {
       this.elem.style.border = param;
       this.textElem.style.border = param;
       this._setTextContainerStyle();
     }
-  }
-  Msg.prototype.setColor = function(param) {
+  };
+  p.setColor = function(param) {
     if (isString(param)) {
       this.elem.style.color = param;
     }
-  }
-  Msg.prototype.setBgColor = function(param) {
+  };
+  p.setBgColor = function(param) {
     if (isString(param)) {
       this.elem.style.backgroundColor = param;
     }
-  }
-  Msg.prototype.setTextBgColor = function(param) {
+  };
+  p.setTextBgColor = function(param) {
     if (isString(param)) {
       this.textElem.style.backgroundColor = param;
     }
-  }
-  Msg.prototype.setPadding = function(param) {
+  };
+  p.setPadding = function(param) {
     if (isString(param)) {
       this.elem.style.padding = param;
       this._setTextContainerStyle();
     }
-  }
+  };
 
 
 
   /** Применить изменяемые параметры */
-  Msg.prototype.applyParams = function() {
+  p.applyParams = function() {
     this._setElemStyle();
     this._setCaptionStyle();
     this._setCloseBtnStyle();
@@ -138,7 +140,7 @@
 
 
   /** Вывод текста в окно */
-  Msg.prototype.textOutput = function(text) {
+  p.textOutput = function(text) {
     this.textElem.innerHTML = this.textElem.innerHTML +
       (this.textElem.innerHTML ? '<br>' : '') +
       this.getTimeStr() + ' > ' +
@@ -148,7 +150,7 @@
 
 
   /** Установка стилей окна */
-  Msg.prototype._setElemStyle = function () {
+  p._setElemStyle = function() {
     this.elem.style.position = 'fixed';
     this.elem.style.display = 'none';
     this.elem.style.cursor = 'default';
@@ -156,7 +158,7 @@
   };
 
   /** Установка стилей для кнопки закрытия */
-  Msg.prototype._setCloseBtnStyle = function () {
+  p._setCloseBtnStyle = function() {
     this.closeBtn.style.position = 'absolute';
     this.closeBtn.style.top = '3px';
     this.closeBtn.style.right = '5px';
@@ -170,13 +172,13 @@
   };
 
   /** Установка стилей для шапки окна */
-  Msg.prototype._setCaptionStyle = function () {
+  p._setCaptionStyle = function() {
     this.caption.textContent = 'Log';
     this.caption.style.padding = '0 0 3px 5px';
   };
 
   /** Установка стилей для шапки окна */
-  Msg.prototype._setTextContainerStyle = function () {
+  p._setTextContainerStyle = function() {
     this.textContainer.style.overflowY = 'scroll';
     this.textContainer.style.maxHeight =
       parseInt(this.height, 10) -
@@ -187,7 +189,7 @@
   };
 
   /** Создать окно */
-  Msg.prototype.create = function(text) {
+  p.create = function() {
     /* создаем */
     this.elem = document.createElement('div');
     this.caption = document.createElement('div');
@@ -205,14 +207,14 @@
 
 
 
-  Msg.prototype.getTimeStr = function() {
+  p.getTimeStr = function() {
     var d = new Date();
     return d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ' ' + d.getMilliseconds();
   };
 
 
 
-  Msg.prototype.hide = function() {
+  p.hide = function() {
     this.elem.removeEventListener('mousedown', this.onMouseDown);
     this.closeBtn.removeEventListener('click', this.hide);
     this.elem.style.display = 'none';
@@ -220,7 +222,7 @@
 
 
 
-  Msg.prototype.show = function(text) {
+  p.show = function(text) {
     if (this.elem) {
       if (this.elem.style.display === 'none') {
         this.elem.style.display = 'block';
@@ -238,13 +240,13 @@
 
 
   /* перетаскивание недоделано (нужно перехватывать скроллинг и не пропускать его выше) */
-  Msg.prototype.moveAt = function(evt) {
+  p.moveAt = function(evt) {
     this.setTop(evt.clientY - this.cursorElemY + 'px');
     this.setLeft(evt.clientX - this.cursorElemX + 'px');
     //this.elem.style.left = this.left;
   };
 
-  Msg.prototype.onMouseDown = function(evt) {
+  p.onMouseDown = function(evt) {
     if (evt.target !== this.closeBtn && evt.target !== this.textContainer && evt.target !== this.textElem ) {
       this.cursorElemX = (typeof evt.offsetX === 'undefined') ? evt.layerX : evt.offsetX;
       this.cursorElemY = (typeof evt.offsetY === 'undefined') ? evt.layerY : evt.offsetY;
@@ -255,7 +257,7 @@
     }
   };
 
-  Msg.prototype.onMouseUp = function() {
+  p.onMouseUp = function() {
     this.elem.style.cursor = 'default';
     document.onmousemove = null;
     this.elem.onmouseup = null;

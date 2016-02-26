@@ -21,7 +21,7 @@ define([], function() {
       selector = selector.slice(1);
     }
     return selector;
-  }
+  };
 
 
   CssMatcher.prototype.setClassName = function(className) {
@@ -55,7 +55,7 @@ define([], function() {
 
 
   CssMatcher.prototype.getDOMElement = function() {
-    this.element = this._baseDOMElement.querySelector(this._selector)
+    this.element = this._baseDOMElement.querySelector(this._selector);
   };
 
 

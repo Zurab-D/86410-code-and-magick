@@ -60,7 +60,7 @@ define([
     }
 
     this.initSelectors();
-  }
+  };
 
 
 
@@ -74,7 +74,7 @@ define([
     this.domControls = new CssMatcher(this.domNames.galleryControls, this.domGallery.element);
     this.domLeft = new CssMatcher(this.domNames.galleryControlLeft, this.domGallery.element);
     this.domRight = new CssMatcher(this.domNames.galleryControlRight, this.domGallery.element);
-  }
+  };
 
 
 
@@ -167,7 +167,7 @@ define([
     if (typeof currentPic === 'string' ) {
       currentPic = this.getPhotoIndex(currentPic);
     }
-    if (typeof currentPic === 'number' && currentPic >= 0  && currentPic < this.photos.length) {
+    if (typeof currentPic === 'number' && currentPic >= 0 && currentPic < this.photos.length) {
       this.currentIndex = currentPic;
       var newImage = new Image();
       newImage.src = this.photos[this.currentIndex].src;
@@ -216,9 +216,9 @@ define([
    * @return {?number}
    */
   Gallery.prototype.getPhotoIndex = function(src) {
-    if (!!src) {
+    if (src) {
       var photo = this.photos.find(function(photosItem) {
-        return photosItem.src.toLowerCase() === src.replace('#photo/', '').toLowerCase()
+        return photosItem.src.toLowerCase() === src.replace('#photo/', '').toLowerCase();
       });
       var i = this.photos.indexOf(photo);
 

@@ -18,7 +18,7 @@ define([], function() {
   return Photo;
 });
 
-/* global Photo */
+/* glo bal Photo */
 ////data-replacement-video
 //(function() {
 //  /**

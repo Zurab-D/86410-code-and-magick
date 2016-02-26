@@ -9,7 +9,7 @@ _arc/
 _doc/
 build/
 bower_components/
-css/*.css
+--css/*.css
 *.sublime*
 *.log
 *.psd

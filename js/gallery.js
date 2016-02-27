@@ -123,7 +123,7 @@ define([
   /** Функция обработки клика по крестику */
   Gallery.prototype._onCloseClick = function() {
     //location.hash = '';
-    window.history.replaceState({}, document.title, "/");
+    window.history.replaceState({}, document.title, '/');
     this.hide();
   };
 

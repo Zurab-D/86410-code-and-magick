@@ -1,3 +1,8 @@
+/** Модуль галереи
+ * Показываем картинки, листаем вправо, влево
+ * @module CssMatcher
+ */
+
 /* global define */
 
 'use strict';
@@ -5,9 +10,13 @@
 define([
   'css-matcher'
 ], function(CssMatcher) {
-  /* клавиша Escape */
+  /** клавиша Escape */
   var KEY_ESCAPE = 27;
+
+  /** клавиша "Влево" */
   var KEY_LEFT = 37;
+
+  /** клавиша "Вправо" */
   var KEY_RIGHT = 39;
 
 
@@ -39,7 +48,7 @@ define([
 
 
   /** Инициализация объекта имен селекторов - задать селекторы нужных элементов html-разметки
-   * @type {Object=}
+   * @type {Object=} parDomNames
    */
   Gallery.prototype.setDomNames = function(parDomNames) {
     parDomNames = parDomNames || {
@@ -113,7 +122,9 @@ define([
 
   /** Функция обработки клика по крестику */
   Gallery.prototype._onCloseClick = function() {
-    location.hash = '';
+    //location.hash = '';
+    window.history.replaceState({}, document.title, "/");
+    this.hide();
   };
 
 

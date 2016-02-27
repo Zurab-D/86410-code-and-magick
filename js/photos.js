@@ -35,7 +35,6 @@ define([
     image.addEventListener('click', function(evt) {
       evt.preventDefault();
       location.hash = '#photo/' + gallery.photos[i].src;
-      gallery.restoreFromHash();
     });
     gallery.restoreFromHash();
   });

@@ -1,9 +1,25 @@
+/** Модуль зоздает объект окна для вывода в него сообщений, текста..
+ * Если назначить его вместо console.log(), то будет удобно - не нужно держать консоль открытым
+ * Пример:
+ *    window.msg = new Msg();
+ *    console.log2 = console.log;
+ *    console.log = function(par) {
+ *      window.msg.show(par);
+ *    };
+ * @module Msg
+ */
+
 /* global define */
 
 'use strict';
 
 define([], function() {
 
+  /** Конструктор объекта
+   * @param {} width  По умолчанию - '40%'
+   * @param {} height По умолчанию - '200px'
+   * @constructor
+   */
   function Msg(width, height) {
     this.hide = this.hide.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -34,11 +50,11 @@ define([], function() {
   }
 
 
-
+  /** для наглядности */
   var p = Msg.prototype;
 
 
-
+  /** проверка - строка ли. взято из underscore */
   function isString(obj) {
     var op = Object.prototype.toString.call(obj);
     return op === '[object String]';
@@ -46,7 +62,7 @@ define([], function() {
 
 
 
-  /** Функции-сеттеры для изиенения параметров */
+  /** Функции-сеттеры для изиенения параметров окна. Тут, я думаю, все понятно из названий. */
   p.setTop = function(param) {
     if (isString(param)) {
       this.elem.style.top = param;
@@ -140,7 +156,9 @@ define([], function() {
   };
 
 
-  /** Вывод текста в окно */
+  /** Вывод текста сообщения в окно
+   * @param {string} text  текст сообщения
+   */
   p.textOutput = function(text) {
     this.textElem.innerHTML = this.textElem.innerHTML +
       (this.textElem.innerHTML ? '<br>' : '') +
@@ -158,6 +176,7 @@ define([], function() {
     this.elem.style.zIndex = 1000;
   };
 
+
   /** Установка стилей для кнопки закрытия */
   p._setCloseBtnStyle = function() {
     this.closeBtn.style.position = 'absolute';
@@ -172,11 +191,13 @@ define([], function() {
     this.closeBtn.setAttribute('title', 'Close');
   };
 
+
   /** Установка стилей для шапки окна */
   p._setCaptionStyle = function() {
     this.caption.textContent = 'Log';
     this.caption.style.padding = '0 0 3px 5px';
   };
+
 
   /** Установка стилей для шапки окна */
   p._setTextContainerStyle = function() {
@@ -188,6 +209,7 @@ define([], function() {
       parseInt(this.elem.style.borderWidth || 0, 10) * 2 +
       'px';
   };
+
 
   /** Создать окно */
   p.create = function() {
@@ -207,14 +229,14 @@ define([], function() {
   };
 
 
-
+  /** Получить текущее время в строчнов виде для вывода в окно */
   p.getTimeStr = function() {
     var d = new Date();
     return d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + ' ' + d.getMilliseconds();
   };
 
 
-
+  /** Спрятать окно */
   p.hide = function() {
     this.elem.removeEventListener('mousedown', this.onMouseDown);
     this.closeBtn.removeEventListener('click', this.hide);
@@ -222,7 +244,7 @@ define([], function() {
   };
 
 
-
+  /** Показать окно */
   p.show = function(text) {
     if (this.elem) {
       if (this.elem.style.display === 'none') {
@@ -240,13 +262,20 @@ define([], function() {
   };
 
 
-  /* перетаскивание недоделано (нужно перехватывать скроллинг и не пропускать его выше) */
+  /** Перемещение окна при перетаскивании
+   *  перетаскивание недоделано (нужно перехватывать скроллинг и не пропускать его выше)
+   * @param {Event} evt
+   */
   p.moveAt = function(evt) {
     this.setTop(evt.clientY - this.cursorElemY + 'px');
     this.setLeft(evt.clientX - this.cursorElemX + 'px');
     //this.elem.style.left = this.left;
   };
 
+
+  /** Захват окна при клике по шапке, для перетаскивания
+   * @param {Event} evt
+   */
   p.onMouseDown = function(evt) {
     if (evt.target !== this.closeBtn && evt.target !== this.textContainer && evt.target !== this.textElem ) {
       this.cursorElemX = (typeof evt.offsetX === 'undefined') ? evt.layerX : evt.offsetX;
@@ -258,11 +287,14 @@ define([], function() {
     }
   };
 
+
+  /** Отпускаем окно после перетаскивания */
   p.onMouseUp = function() {
     this.elem.style.cursor = 'default';
     document.onmousemove = null;
     this.elem.onmouseup = null;
   };
+
 
   return Msg;
 });

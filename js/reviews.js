@@ -1,9 +1,17 @@
-/* global Review */
+/* global define */
 
 'use strict';
 
-(function() {
+define([
+  'review'
+], function(Review) {
+  /**
+   * Адрес для AJAX
+   * @const
+   * @type {string}
+   */
   var URL_AJAX = 'http://o0.github.io/assets/json/reviews.json';
+
   var reviewsList = document.querySelector('.reviews-list');
   var reviewsFilter = document.querySelector('.reviews-filter');
   var filterControls = document.forms[0].querySelectorAll('input[name="reviews"]');
@@ -12,17 +20,30 @@
   var activeFilterId;
   var filteredReviews;
   var filteredPagesCount;
-  // кол-во отзывов выводимых за раз (по кнопке "Ещё", по скролу)
+
+  /**
+   * кол-во отзывов выводимых за раз (по кнопке "Ещё", по скролу)
+   * @const
+   * @type {number}
+   */
   var PAGE_SIZE = 3;
   var currentPage = 0;
   var scrollTimeout;
-  // таймаут прореживания события onscroll
+
+  /**
+   * Таймаут прореживания события onscroll
+   * @const
+   * @type {number}
+   */
   var TIMEOUT_SCROLL = 10;
 
-  /* Эта переменная нужна только при работе по AJAX,
-     для работы по JSONP  нужно:
-      1. закомментировать эту переменную
-      2. раскомментировать два закомметированных скрипта в низу файла index.html */
+  /**
+   * Эта переменная нужна только при работе по AJAX,
+   * для работы по JSONP  нужно:
+   *    1. закомментировать эту переменную
+   *  2. раскомментировать два закомметированных скрипта в низу файла index.html
+   * @type {?Array.<Object>}
+   */
   var reviews;
 
 
@@ -52,7 +73,6 @@
 
     /* создаем xhr */
     var xhr = new XMLHttpRequest();
-    xhr.timeout = TIMEOUT_XHR;
 
     xhr.ontimeout = function() {
       if (onTimeoutFunc) {
@@ -70,6 +90,7 @@
     };
 
     xhr.open(method, url, true);
+    xhr.timeout = TIMEOUT_XHR;
 
     if (method.toUpperCase() === 'GET') {
       xhr.send();
@@ -162,10 +183,58 @@
       var reviewElement = new Review(review);
       reviewElement.render();
       reviewsList.appendChild(reviewElement.element);
+
+      /* голосовалка за/против комментарий */
+      reviewElement.onVote = function(isYesVote) {
+        console.log('reviewElement.onVote :: before :: rating=' + this._data.review_usefulness);
+        isYesVote = (typeof isYesVote === 'undefined') ? 1 : isYesVote;
+        if (isYesVote) {
+          // если уже подан протовоположный голос, плюсуем на два для компенсации
+          if (this.element.querySelector('.review-quiz-answer-no').classList.contains('review-quiz-answer-active')) {
+            this._data.review_usefulness += 2;
+          } else {
+            this._data.review_usefulness += 1;
+          }
+          this.element.querySelector('.review-quiz-answer-yes').classList.add('review-quiz-answer-active');
+          this.element.querySelector('.review-quiz-answer-no').classList.remove('review-quiz-answer-active');
+        } else {
+          if (this.element.querySelector('.review-quiz-answer-yes').classList.contains('review-quiz-answer-active')) {
+            this._data.review_usefulness -= 2;
+          } else {
+            this._data.review_usefulness -= 1;
+          }
+          this.element.querySelector('.review-quiz-answer-no').classList.add('review-quiz-answer-active');
+          this.element.querySelector('.review-quiz-answer-yes').classList.remove('review-quiz-answer-active');
+        }
+        console.log('reviewElement.onVote :: after :: rating=' + this._data.review_usefulness);
+      };
     });
 
     /* прячем сообщение о начале загрузки */
     hideLoadingMsg();
+  };
+
+
+
+  /**
+   * Порядковый номер фильтра
+   * @param {string} filterId  id-шник кликнутого радио-инпута
+   * @return {?number}
+   */
+  var getFilterIndex = function(filterId) {
+    switch (filterId) {
+      case 'reviews-all':
+        return 0;
+      case 'reviews-recent':
+        return 1;
+      case 'reviews-good':
+        return 2;
+      case 'reviews-bad':
+        return 3;
+      case 'reviews-popular':
+        return 4;
+    }
+    return 0;
   };
 
 
@@ -182,11 +251,11 @@
     currentPage = 0;
     window.removeEventListener('scroll', scrollProcessing);
 
-    switch (filterId) {
-      case 'reviews-all':
+    switch (getFilterIndex(filterId)) {
+      case 0:
         filteredReviews = reviews.slice(0);
         break;
-      case 'reviews-recent':
+      case 1:
         /* дата <= 14 дней недели */
         filteredReviews = reviews.filter(function(review) {
           return new Date(review.date) > new Date(Date.now() - 1000 * 60 * 60 * 24 * 14);
@@ -194,7 +263,7 @@
           return b.date - a.date;
         });
         break;
-      case 'reviews-good':
+      case 2:
         // Хорошие — с рейтингом не ниже 3, отсортированные по убыванию рейтинга
         filteredReviews = reviews.filter(function(review) {
           return review.rating >= 3;
@@ -202,7 +271,7 @@
           return b.rating - a.rating;
         });
         break;
-      case 'reviews-bad':
+      case 3:
         // Плохие — с рейтингом не выше 2, отсортированные по возрастанию рейтинга.
         filteredReviews = reviews.filter(function(review) {
           return review.rating <= 2;
@@ -210,8 +279,8 @@
           return a.rating - b.rating;
         });
         break;
-      case 'reviews-popular':
-        // Популярные — отсортированные по убыванию оценки отзыва (поле reviewRating)
+      case 4:
+        // Популярные — отсортированные по убыванию оценки отзыва (поле review_usefulness)
         filteredReviews = reviews.slice(0).sort(function(a, b) {
           return b['review_usefulness'] - a['review_usefulness'];
         });
@@ -219,6 +288,7 @@
     }
     filteredPagesCount = Math.ceil(filteredReviews.length / PAGE_SIZE);
     renderReviews(filteredReviews);
+    localStorage.setItem('filterId', filterId);
   };
 
 
@@ -243,7 +313,8 @@
    */
   var renderReviewsJson = function(dataJson) {
     reviews = JSON.parse(dataJson);
-    filterControls[0].click();
+    var filterIndex = getFilterIndex(localStorage.getItem('filterId'));
+    filterControls[filterIndex].click();
   };
 
 
@@ -301,4 +372,4 @@
 
   /* показываем фильтры отзывов */
   reviewsFilter.classList.remove('invisible');
-})();
+});

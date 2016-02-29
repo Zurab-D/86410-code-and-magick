@@ -1,10 +1,16 @@
+/* global define, docCookies */
+
 'use strict';
 
-(function() {
+define([], function() {
   var formContainer = document.querySelector('.overlay-container');
   var formOpenButton = document.querySelector('.reviews-controls-new');
   var formCloseButton = document.querySelector('.review-form-close');
 
+  /**
+   * Клик по кнопке "Добавить свой"
+   * @param {Event} evt
+   */
   formOpenButton.onclick = function(evt) {
     evt.preventDefault();
     formContainer.classList.remove('invisible');
@@ -12,6 +18,10 @@
     readCookies();
   };
 
+  /**
+   * Клик по крестику в форме
+   * @param {Event} evt
+   */
   formCloseButton.onclick = function(evt) {
     evt.preventDefault();
     formContainer.classList.add('invisible');
@@ -20,7 +30,6 @@
 
 
   /* ----------------------------------------------------------------------- */
-  /*global docCookies*/
   var reviewName = document.querySelector('#review-name');
   var reviewText = document.querySelector('#review-text');
   var reviewMarksAll = document.querySelectorAll('input[type="radio"][name="review-mark"]');
@@ -151,7 +160,9 @@
     try {
       reviewName.value = docCookies.getItem('name');
       var mark = docCookies.getItem('mark');
-      reviewMarksAll[mark - 1].checked = true;
+      if (!isNaN(parseInt(mark, 10))) {
+        reviewMarksAll[parseInt(mark, 10) - 1].checked = true;
+      }
     } catch (err) {
       console.log('Ошибка ' + err.name + ': ' + err.message);
     }
@@ -197,4 +208,4 @@
       console.log('Форма не валидна!');
     }
   };
-})();
+});

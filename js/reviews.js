@@ -3,8 +3,13 @@
 'use strict';
 
 define([
-  'review'
-], function(Review) {
+  'review',
+  'review-filter-all',
+  'review-filter-recent',
+  'review-filter-good',
+  'review-filter-bad',
+  'review-filter-popular'
+], function(Review, ReviewFilterAll, ReviewFilterRecent, ReviewFilterGood, ReviewFilterBad, ReviewFilterPopular) {
   /**
    * Адрес для AJAX
    * @const
@@ -266,23 +271,23 @@ define([
 
     switch (getFilterIndex(filterId)) {
       case fi.ALL:
-        reviewsFilter = new window.ReviewFilterAll();
+        reviewsFilter = new ReviewFilterAll();
         break;
       case fi.RECENT:
         /* дата <= 14 дней недели */
-        reviewsFilter = new window.ReviewFilterRecant();
+        reviewsFilter = new ReviewFilterRecent();
         break;
       case fi.GOOD:
         // Хорошие — с рейтингом не ниже 3, отсортированные по убыванию рейтинга
-        reviewsFilter = new window.ReviewFilterGood();
+        reviewsFilter = new ReviewFilterGood();
         break;
       case fi.BAD:
         // Плохие — с рейтингом не выше 2, отсортированные по возрастанию рейтинга.
-        reviewsFilter = new window.ReviewFilterBad();
+        reviewsFilter = new ReviewFilterBad();
         break;
       case fi.POPULAR:
         // Популярные — отсортированные по убыванию оценки отзыва (поле review_usefulness)
-        reviewsFilter = new window.ReviewFilterPopular();
+        reviewsFilter = new ReviewFilterPopular();
         break;
     }
     filteredReviews = reviewsFilter.filter(reviews);

@@ -47,6 +47,19 @@ define([
   var reviews;
 
 
+  /**
+   * Индексы фильтров каментов
+   * @enum {number}
+   */
+  var fi = {
+    ALL: 0,
+    RECENT: 1,
+    GOOD: 2,
+    BAD: 3,
+    POPULAR: 4
+  };
+
+
 
 
   /**
@@ -224,15 +237,15 @@ define([
   var getFilterIndex = function(filterId) {
     switch (filterId) {
       case 'reviews-all':
-        return 0;
+        return fi.ALL;
       case 'reviews-recent':
-        return 1;
+        return fi.RECENT;
       case 'reviews-good':
-        return 2;
+        return fi.GOOD;
       case 'reviews-bad':
-        return 3;
+        return fi.BAD;
       case 'reviews-popular':
-        return 4;
+        return fi.POPULAR;
     }
     return 0;
   };
@@ -252,40 +265,27 @@ define([
     window.removeEventListener('scroll', scrollProcessing);
 
     switch (getFilterIndex(filterId)) {
-      case 0:
-        filteredReviews = reviews.slice(0);
+      case fi.ALL:
+        reviewsFilter = new window.ReviewFilterAll();
         break;
-      case 1:
+      case fi.RECENT:
         /* дата <= 14 дней недели */
-        filteredReviews = reviews.filter(function(review) {
-          return new Date(review.date) > new Date(Date.now() - 1000 * 60 * 60 * 24 * 14);
-        }).sort(function(a, b) {
-          return b.date - a.date;
-        });
+        reviewsFilter = new window.ReviewFilterRecant();
         break;
-      case 2:
+      case fi.GOOD:
         // Хорошие — с рейтингом не ниже 3, отсортированные по убыванию рейтинга
-        filteredReviews = reviews.filter(function(review) {
-          return review.rating >= 3;
-        }).sort(function(a, b) {
-          return b.rating - a.rating;
-        });
+        reviewsFilter = new window.ReviewFilterGood();
         break;
-      case 3:
+      case fi.BAD:
         // Плохие — с рейтингом не выше 2, отсортированные по возрастанию рейтинга.
-        filteredReviews = reviews.filter(function(review) {
-          return review.rating <= 2;
-        }).sort(function(a, b) {
-          return a.rating - b.rating;
-        });
+        reviewsFilter = new window.ReviewFilterBad();
         break;
-      case 4:
+      case fi.POPULAR:
         // Популярные — отсортированные по убыванию оценки отзыва (поле review_usefulness)
-        filteredReviews = reviews.slice(0).sort(function(a, b) {
-          return b['review_usefulness'] - a['review_usefulness'];
-        });
+        reviewsFilter = new window.ReviewFilterPopular();
         break;
     }
+    filteredReviews = reviewsFilter.filter(reviews);
     filteredPagesCount = Math.ceil(filteredReviews.length / PAGE_SIZE);
     renderReviews(filteredReviews);
     localStorage.setItem('filterId', filterId);

@@ -125,7 +125,7 @@ define([
     try {
       window.history.replaceState({}, document.title, '/');
       this.hide();
-    } catch(err) {
+    } catch (err) {
       console.log(err);
       location.hash = '';
     }

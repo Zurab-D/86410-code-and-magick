@@ -237,10 +237,10 @@ define([
    * @type {Object}
    */
   var filterHash = {
-    'reviews-all'    : new ReviewFilterAll(),
-    'reviews-recent' : new ReviewFilterRecent(),
-    'reviews-good'   : new ReviewFilterGood(),
-    'reviews-bad'    : new ReviewFilterBad(),
+    'reviews-all': new ReviewFilterAll(),
+    'reviews-recent': new ReviewFilterRecent(),
+    'reviews-good': new ReviewFilterGood(),
+    'reviews-bad': new ReviewFilterBad(),
     'reviews-popular': new ReviewFilterPopular()
   };
 
@@ -297,10 +297,10 @@ define([
    */
   var getFilterIndex = function(filterId) {
     switch (filterId) {
-      case 'reviews-all'    : return fi.ALL;
-      case 'reviews-recent' : return fi.RECENT;
-      case 'reviews-good'   : return fi.GOOD;
-      case 'reviews-bad'    : return fi.BAD;
+      case 'reviews-all': return fi.ALL;
+      case 'reviews-recent': return fi.RECENT;
+      case 'reviews-good': return fi.GOOD;
+      case 'reviews-bad': return fi.BAD;
       case 'reviews-popular': return fi.POPULAR;
     }
     return 0;

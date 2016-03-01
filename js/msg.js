@@ -72,7 +72,7 @@ define([], function() {
   }
 
   function parseIntZ(par) {
-    var res = parseInt(par);
+    var res = parseInt(par, 10);
     return isNumber(res) && !isNaN(res) ? res : 0;
   }
 

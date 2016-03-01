@@ -164,7 +164,7 @@ define([], function() {
       (this.textElem.innerHTML ? '<br>' : '') +
       this.getTimeStr() + ' > ' +
       text;
-    this.textContainer.scrollTop = 9999;
+    this.textContainer.scrollTop = 9999999999999;
   };
 
 

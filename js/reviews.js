@@ -3,8 +3,13 @@
 'use strict';
 
 define([
-  'review'
-], function(Review) {
+  'review',
+  'review-filter/review-filter-all',
+  'review-filter/review-filter-recent',
+  'review-filter/review-filter-good',
+  'review-filter/review-filter-bad',
+  'review-filter/review-filter-popular'
+], function(Review, ReviewFilterAll, ReviewFilterRecent, ReviewFilterGood, ReviewFilterBad, ReviewFilterPopular) {
   /**
    * Адрес для AJAX
    * @const
@@ -40,7 +45,7 @@ define([
   /**
    * Эта переменная нужна только при работе по AJAX,
    * для работы по JSONP  нужно:
-   *    1. закомментировать эту переменную
+   *  1. закомментировать эту переменную
    *  2. раскомментировать два закомметированных скрипта в низу файла index.html
    * @type {?Array.<Object>}
    */
@@ -58,7 +63,6 @@ define([
     BAD: 3,
     POPULAR: 4
   };
-
 
 
 
@@ -229,25 +233,24 @@ define([
 
 
 
+  /** Хэш-объект для вызова соответсвующего фильтра (ReviewFilter).
+   * @type {Object}
+   */
+  var filterHash = {
+    'reviews-all'    : new ReviewFilterAll(),
+    'reviews-recent' : new ReviewFilterRecent(),
+    'reviews-good'   : new ReviewFilterGood(),
+    'reviews-bad'    : new ReviewFilterBad(),
+    'reviews-popular': new ReviewFilterPopular()
+  };
+
   /**
    * Порядковый номер фильтра
    * @param {string} filterId  id-шник кликнутого радио-инпута
    * @return {?number}
    */
-  var getFilterIndex = function(filterId) {
-    switch (filterId) {
-      case 'reviews-all':
-        return fi.ALL;
-      case 'reviews-recent':
-        return fi.RECENT;
-      case 'reviews-good':
-        return fi.GOOD;
-      case 'reviews-bad':
-        return fi.BAD;
-      case 'reviews-popular':
-        return fi.POPULAR;
-    }
-    return 0;
+  var getFilter = function(filterId) {
+    return filterHash[filterId];
   };
 
 
@@ -260,32 +263,12 @@ define([
     if (activeFilterId === filterId) {
       return;
     }
-
     currentPage = 0;
     window.removeEventListener('scroll', scrollProcessing);
 
-    switch (getFilterIndex(filterId)) {
-      case fi.ALL:
-        reviewsFilter = new window.ReviewFilterAll();
-        break;
-      case fi.RECENT:
-        /* дата <= 14 дней недели */
-        reviewsFilter = new window.ReviewFilterRecant();
-        break;
-      case fi.GOOD:
-        // Хорошие — с рейтингом не ниже 3, отсортированные по убыванию рейтинга
-        reviewsFilter = new window.ReviewFilterGood();
-        break;
-      case fi.BAD:
-        // Плохие — с рейтингом не выше 2, отсортированные по возрастанию рейтинга.
-        reviewsFilter = new window.ReviewFilterBad();
-        break;
-      case fi.POPULAR:
-        // Популярные — отсортированные по убыванию оценки отзыва (поле review_usefulness)
-        reviewsFilter = new window.ReviewFilterPopular();
-        break;
-    }
+    reviewsFilter = getFilter(filterId);
     filteredReviews = reviewsFilter.filter(reviews);
+
     filteredPagesCount = Math.ceil(filteredReviews.length / PAGE_SIZE);
     renderReviews(filteredReviews);
     localStorage.setItem('filterId', filterId);
@@ -303,6 +286,24 @@ define([
         setActiveFilter(clickedElement.id);
       }
     });
+  };
+
+
+
+  /**
+   * Порядковый номер фильтра
+   * @param {string} filterId  id-шник кликнутого радио-инпута
+   * @return {?number}
+   */
+  var getFilterIndex = function(filterId) {
+    switch (filterId) {
+      case 'reviews-all'    : return fi.ALL;
+      case 'reviews-recent' : return fi.RECENT;
+      case 'reviews-good'   : return fi.GOOD;
+      case 'reviews-bad'    : return fi.BAD;
+      case 'reviews-popular': return fi.POPULAR;
+    }
+    return 0;
   };
 
 

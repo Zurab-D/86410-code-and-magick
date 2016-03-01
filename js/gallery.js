@@ -122,9 +122,13 @@ define([
 
   /** Функция обработки клика по крестику */
   Gallery.prototype._onCloseClick = function() {
-    //location.hash = '';
-    window.history.replaceState({}, document.title, '/');
-    this.hide();
+    try {
+      window.history.replaceState({}, document.title, '/');
+      this.hide();
+    } catch(err) {
+      console.log(err);
+      location.hash = '';
+    }
   };
 
 

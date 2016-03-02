@@ -3,8 +3,13 @@
 'use strict';
 
 define([
-  'review'
-], function(Review) {
+  'review',
+  'review-filter/review-filter-all',
+  'review-filter/review-filter-recent',
+  'review-filter/review-filter-good',
+  'review-filter/review-filter-bad',
+  'review-filter/review-filter-popular'
+], function(Review, ReviewFilterAll, ReviewFilterRecent, ReviewFilterGood, ReviewFilterBad, ReviewFilterPopular) {
   /**
    * Адрес для AJAX
    * @const
@@ -40,12 +45,24 @@ define([
   /**
    * Эта переменная нужна только при работе по AJAX,
    * для работы по JSONP  нужно:
-   *    1. закомментировать эту переменную
+   *  1. закомментировать эту переменную
    *  2. раскомментировать два закомметированных скрипта в низу файла index.html
    * @type {?Array.<Object>}
    */
   var reviews;
 
+
+  /**
+   * Индексы фильтров каментов
+   * @enum {number}
+   */
+  var fi = {
+    ALL: 0,
+    RECENT: 1,
+    GOOD: 2,
+    BAD: 3,
+    POPULAR: 4
+  };
 
 
 
@@ -216,25 +233,24 @@ define([
 
 
 
+  /** Хэш-объект для вызова соответсвующего фильтра (ReviewFilter).
+   * @type {Object}
+   */
+  var filterHash = {
+    'reviews-all': new ReviewFilterAll(),
+    'reviews-recent': new ReviewFilterRecent(),
+    'reviews-good': new ReviewFilterGood(),
+    'reviews-bad': new ReviewFilterBad(),
+    'reviews-popular': new ReviewFilterPopular()
+  };
+
   /**
    * Порядковый номер фильтра
    * @param {string} filterId  id-шник кликнутого радио-инпута
    * @return {?number}
    */
-  var getFilterIndex = function(filterId) {
-    switch (filterId) {
-      case 'reviews-all':
-        return 0;
-      case 'reviews-recent':
-        return 1;
-      case 'reviews-good':
-        return 2;
-      case 'reviews-bad':
-        return 3;
-      case 'reviews-popular':
-        return 4;
-    }
-    return 0;
+  var getFilter = function(filterId) {
+    return filterHash[filterId];
   };
 
 
@@ -247,45 +263,12 @@ define([
     if (activeFilterId === filterId) {
       return;
     }
-
     currentPage = 0;
     window.removeEventListener('scroll', scrollProcessing);
 
-    switch (getFilterIndex(filterId)) {
-      case 0:
-        filteredReviews = reviews.slice(0);
-        break;
-      case 1:
-        /* дата <= 14 дней недели */
-        filteredReviews = reviews.filter(function(review) {
-          return new Date(review.date) > new Date(Date.now() - 1000 * 60 * 60 * 24 * 14);
-        }).sort(function(a, b) {
-          return b.date - a.date;
-        });
-        break;
-      case 2:
-        // Хорошие — с рейтингом не ниже 3, отсортированные по убыванию рейтинга
-        filteredReviews = reviews.filter(function(review) {
-          return review.rating >= 3;
-        }).sort(function(a, b) {
-          return b.rating - a.rating;
-        });
-        break;
-      case 3:
-        // Плохие — с рейтингом не выше 2, отсортированные по возрастанию рейтинга.
-        filteredReviews = reviews.filter(function(review) {
-          return review.rating <= 2;
-        }).sort(function(a, b) {
-          return a.rating - b.rating;
-        });
-        break;
-      case 4:
-        // Популярные — отсортированные по убыванию оценки отзыва (поле review_usefulness)
-        filteredReviews = reviews.slice(0).sort(function(a, b) {
-          return b['review_usefulness'] - a['review_usefulness'];
-        });
-        break;
-    }
+    reviewsFilter = getFilter(filterId);
+    filteredReviews = reviewsFilter.filter(reviews);
+
     filteredPagesCount = Math.ceil(filteredReviews.length / PAGE_SIZE);
     renderReviews(filteredReviews);
     localStorage.setItem('filterId', filterId);
@@ -303,6 +286,24 @@ define([
         setActiveFilter(clickedElement.id);
       }
     });
+  };
+
+
+
+  /**
+   * Порядковый номер фильтра
+   * @param {string} filterId  id-шник кликнутого радио-инпута
+   * @return {?number}
+   */
+  var getFilterIndex = function(filterId) {
+    switch (filterId) {
+      case 'reviews-all': return fi.ALL;
+      case 'reviews-recent': return fi.RECENT;
+      case 'reviews-good': return fi.GOOD;
+      case 'reviews-bad': return fi.BAD;
+      case 'reviews-popular': return fi.POPULAR;
+    }
+    return 0;
   };
 
 

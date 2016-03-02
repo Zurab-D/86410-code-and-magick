@@ -6,12 +6,13 @@ requirejs.config({
   baseUrl: 'js'
 });
 
-define(['msg', 'game', 'photos', 'form', 'reviews'], function(Msg) {
+define(['msg', 'get-window', 'game', 'photos', 'form', 'reviews'], function(Msg, getWindow) {
   if (Msg) {
-    window.msg = new Msg();
+    var win = getWindow();
+    win.msg = new Msg();
     console.log2 = console.log;
     console.log = function(par) {
-      window.msg.show(par);
+      win.msg.show(par);
     };
   }
 });

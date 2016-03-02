@@ -1,6 +1,6 @@
 'use strict';
 
-(function() {
+define([], function() {
   /**
    * @param {Function} Child
    * @param {Function} Parent
@@ -11,5 +11,5 @@
     Child.prototype = new TempConstructor();
   }
 
-  window.inherit = inherit;
-})();
+  return inherit;
+});

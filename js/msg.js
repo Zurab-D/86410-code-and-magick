@@ -1,11 +1,14 @@
 /** Модуль зоздает объект окна для вывода в него сообщений, текста..
  * Если назначить его вместо console.log(), то будет удобно - не нужно держать консоль открытым
  * Пример:
- *    window.msg = new Msg();
- *    console.log2 = console.log;
- *    console.log = function(par) {
- *      window.msg.show(par);
- *    };
+ *   if (Msg) {
+ *     var win = getWindow();
+ *     win.msg = new Msg();
+ *     console.log2 = console.log;
+ *     console.log = function(par) {
+ *       win.msg.show(par);
+ *     };
+ *   }
  * @module Msg
  */
 
@@ -47,17 +50,30 @@ define([], function() {
     this.setTextBgColor('lightyellow');
     this.setBorder('1px solid green');
     this.setCaptionFont('italic 15px Arial');
+    this.elem.id = 'msg-main-block';
   }
 
 
   /** для наглядности */
   var p = Msg.prototype;
+  var timeoutThrotlleDrag;
+  var TIMEOUT_DRAG = 10;
 
 
   /** проверка - строка ли. взято из underscore */
   function isString(obj) {
     var op = Object.prototype.toString.call(obj);
     return op === '[object String]';
+  }
+
+  function isNumber(obj) {
+    var op = Object.prototype.toString.call(obj);
+    return op === '[object Number]';
+  }
+
+  function parseIntZ(par) {
+    var res = parseInt(par, 10);
+    return isNumber(res) && !isNaN(res) ? res : 0;
   }
 
 
@@ -181,21 +197,22 @@ define([], function() {
   p._setCloseBtnStyle = function() {
     this.closeBtn.style.position = 'absolute';
     this.closeBtn.style.top = '3px';
-    this.closeBtn.style.right = '5px';
-    this.closeBtn.style.width = '6px';
-    this.closeBtn.style.height = '6px';
-    this.closeBtn.style.border = '4px solid DarkRed';
+    this.closeBtn.style.right = '3px';
+    this.closeBtn.style.width = '4px';
+    this.closeBtn.style.height = '5px';
+    this.closeBtn.style.border = '5px solid DarkRed';
     this.closeBtn.style.borderRadius = '50%';
     this.closeBtn.style.backgroundColor = 'red';
     this.closeBtn.style.cursor = 'pointer';
     this.closeBtn.setAttribute('title', 'Close');
+    this.closeBtn.id = 'msg-btn-close';
   };
 
 
   /** Установка стилей для шапки окна */
   p._setCaptionStyle = function() {
     this.caption.textContent = 'Log';
-    this.caption.style.padding = '0 0 3px 5px';
+    this.caption.style.padding = '0 0 4px 2px';
   };
 
 
@@ -267,9 +284,16 @@ define([], function() {
    * @param {Event} evt
    */
   p.moveAt = function(evt) {
-    this.setTop(evt.clientY - this.cursorElemY + 'px');
-    this.setLeft(evt.clientX - this.cursorElemX + 'px');
-    //this.elem.style.left = this.left;
+    if (!timeoutThrotlleDrag) {
+      timeoutThrotlleDrag = setTimeout(function() {
+        clearTimeout(timeoutThrotlleDrag);
+        timeoutThrotlleDrag = null;
+      }, TIMEOUT_DRAG);
+      this.setTop(evt.clientY - this.cursorElemY - parseIntZ(this.elem.style.marginTop) -
+        parseIntZ(this.elem.style.paddingTop) - parseIntZ(this.elem.style.borderTop) + 'px');
+      this.setLeft(evt.clientX - this.cursorElemX - parseIntZ(this.elem.style.marginLeft) -
+        parseIntZ(this.elem.style.paddingLeft) - parseIntZ(this.elem.style.borderLeft) + 'px');
+    }
   };
 
 
@@ -278,6 +302,7 @@ define([], function() {
    */
   p.onMouseDown = function(evt) {
     if (evt.target !== this.closeBtn && evt.target !== this.textContainer && evt.target !== this.textElem ) {
+      document.body.setAttribute('onselectstart', 'return false;');
       this.cursorElemX = (typeof evt.offsetX === 'undefined') ? evt.layerX : evt.offsetX;
       this.cursorElemY = (typeof evt.offsetY === 'undefined') ? evt.layerY : evt.offsetY;
       this.elem.style.cursor = 'pointer';
@@ -293,6 +318,7 @@ define([], function() {
     this.elem.style.cursor = 'default';
     document.onmousemove = null;
     this.elem.onmouseup = null;
+    document.body.removeAttribute('onselectstart');
   };
 
 

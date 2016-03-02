@@ -18,7 +18,7 @@ define(['inherit', 'review-filter/review-filter-base'], function(inherit, Review
    */
   ReviewFilterPopular.prototype.filter = function(reviews) {
     return reviews.slice(0).sort(function(a, b) {
-      return b['review_usefulness'] - a['review_usefulness'];
+      return b.getReviewUsefulness() - a.getReviewUsefulness();
     });
   };
 

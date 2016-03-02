@@ -21,9 +21,9 @@ define(['inherit', 'review-filter/review-filter-base'], function(inherit, Review
     var DAYS_14 = 1000 * 60 * 60 * 24 * 14;
 
     return reviews.filter(function(review) {
-      return new Date(review.date) > new Date(Date.now() - DAYS_14);
+      return new Date(review.getDate()) > new Date(Date.now() - DAYS_14);
     }).sort(function(a, b) {
-      return b.date - a.date;
+      return b.getDate() - a.getDate();
     });
   };
 

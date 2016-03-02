@@ -8,8 +8,9 @@ define([
   'review-filter/review-filter-recent',
   'review-filter/review-filter-good',
   'review-filter/review-filter-bad',
-  'review-filter/review-filter-popular'
-], function(Review, ReviewFilterAll, ReviewFilterRecent, ReviewFilterGood, ReviewFilterBad, ReviewFilterPopular) {
+  'review-filter/review-filter-popular',
+  'review-data'
+], function(Review, ReviewFilterAll, ReviewFilterRecent, ReviewFilterGood, ReviewFilterBad, ReviewFilterPopular, ReviewData) {
   /**
    * Адрес для AJAX
    * @const
@@ -23,7 +24,7 @@ define([
   var btnShowMore = document.querySelector('.reviews-controls-more');
   var footer = document.querySelector('footer');
   var activeFilterId;
-  var filteredReviews;
+  var filteredReviews = [];
   var filteredPagesCount;
 
   /**
@@ -49,7 +50,12 @@ define([
    *  2. раскомментировать два закомметированных скрипта в низу файла index.html
    * @type {?Array.<Object>}
    */
-  var reviews;
+  var reviews = [];
+
+  /**
+   * @type {?Array.<Object>}
+   */
+  var reviewObjects = [];
 
 
   /**
@@ -178,7 +184,7 @@ define([
 
   /**
    * Вывод данных на страницу
-   * @param {Array} reviewsToRender  Массив объектов (отзывов), которые нужно вывести на страницу
+   * @param {Array.<ReviewData>} reviewsToRender  Массив объектов (отзывов), которые нужно вывести на страницу
    * @param {boolean=} isAppendMode  Режим добавления новых отзывов или предварительно чистим контейнер
    */
   var renderReviews = function(reviewsToRender, isAppendMode) {
@@ -202,28 +208,11 @@ define([
       reviewsList.appendChild(reviewElement.element);
 
       /* голосовалка за/против комментарий */
-      reviewElement.onVote = function(isYesVote) {
-        console.log('reviewElement.onVote :: before :: rating=' + this._data.review_usefulness);
+      reviewElement.onVote = function(isYesVote, callback) {
+        console.log('reviewElement.onVote :: before :: rating=' + review.getReviewUsefulness());
         isYesVote = (typeof isYesVote === 'undefined') ? 1 : isYesVote;
-        if (isYesVote) {
-          // если уже подан протовоположный голос, плюсуем на два для компенсации
-          if (this.element.querySelector('.review-quiz-answer-no').classList.contains('review-quiz-answer-active')) {
-            this._data.review_usefulness += 2;
-          } else {
-            this._data.review_usefulness += 1;
-          }
-          this.element.querySelector('.review-quiz-answer-yes').classList.add('review-quiz-answer-active');
-          this.element.querySelector('.review-quiz-answer-no').classList.remove('review-quiz-answer-active');
-        } else {
-          if (this.element.querySelector('.review-quiz-answer-yes').classList.contains('review-quiz-answer-active')) {
-            this._data.review_usefulness -= 2;
-          } else {
-            this._data.review_usefulness -= 1;
-          }
-          this.element.querySelector('.review-quiz-answer-no').classList.add('review-quiz-answer-active');
-          this.element.querySelector('.review-quiz-answer-yes').classList.remove('review-quiz-answer-active');
-        }
-        console.log('reviewElement.onVote :: after :: rating=' + this._data.review_usefulness);
+        review.setReviewUsefulness(isYesVote, callback);
+        console.log('reviewElement.onVote :: after :: rating=' + review.getReviewUsefulness());
       };
     });
 
@@ -267,7 +256,7 @@ define([
     window.removeEventListener('scroll', scrollProcessing);
 
     reviewsFilter = getFilter(filterId);
-    filteredReviews = reviewsFilter.filter(reviews);
+    filteredReviews = reviewsFilter.filter(reviewObjects);
 
     filteredPagesCount = Math.ceil(filteredReviews.length / PAGE_SIZE);
     renderReviews(filteredReviews);
@@ -314,6 +303,9 @@ define([
    */
   var renderReviewsJson = function(dataJson) {
     reviews = JSON.parse(dataJson);
+    reviews.forEach(function(item) {
+      reviewObjects.push(new ReviewData(item));
+    });
     var filterIndex = getFilterIndex(localStorage.getItem('filterId'));
     filterControls[filterIndex].click();
   };

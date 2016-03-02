@@ -18,9 +18,9 @@ define(['inherit', 'review-filter/review-filter-base'], function(inherit, Review
    */
   ReviewFilterGood.prototype.filter = function(reviews) {
     return reviews.filter(function(review) {
-      return review.rating >= 3;
+      return review.getRating() >= 3;
     }).sort(function(a, b) {
-      return b.rating - a.rating;
+      return b.getRating() - a.getRating();
     });
   };
 

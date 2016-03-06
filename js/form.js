@@ -129,7 +129,7 @@ define([], function() {
 
   function getDateExpire(dateLastBirthDay) {
     /* сколько дней прошло после последнего ДР */
-    var daysAfterLastBirthDay = Date.now() - dateLastBirthDay;
+    var daysAfterLastBirthDay = new Date() - dateLastBirthDay;
 
     /* дата протухания печенюшки = сейчас + кол-во дней с последнего ДР  */
     return new Date(Date.now() + daysAfterLastBirthDay).toUTCString();
@@ -201,7 +201,7 @@ define([], function() {
   form.onsubmit = function(event) {
     event.preventDefault();
     if (isFormValid()) {
-      var dateLastBirthDay = Date('2015-11-04');
+      var dateLastBirthDay = new Date('2015-11-04');
       saveCookies(reviewName.value, getMark(), getDateExpire(dateLastBirthDay));
       form.submit();
     } else {
